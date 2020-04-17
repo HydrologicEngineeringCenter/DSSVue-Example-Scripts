@@ -1,6 +1,7 @@
 # DSSVue-Ch8-SampleScripts
 This repository is for testing and updating the sample scripts from Chapter 8 of the DSSVue User's Manual.
 
+https://www.hec.usace.army.mil/confluence/dssvuedocs/latest/appendixc-examplescripts
 
 A batch file runall.bat is used to run all jython files in the directory
 
