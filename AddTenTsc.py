@@ -4,10 +4,13 @@
 # displayinselector=true
 #  Add 10 to each value using TimeSeriesContainer
 #
-from hec.script import *
-from hec.heclib.dss import *
-from hec.dataTable import *
-from java import *
+from hec.script import Plot
+from hec.io import TimeSeriesContainer
+#from hec.io import PairedDataContainer"
+#from hec.io import TimeSeriesMath\n"
+#from hec.io import PairedDataMath\n"
+from hec.heclib.dss import HecDss
+
 
 #  Open the file and get the data
 try:  
