@@ -1,11 +1,17 @@
-# name=DataEntry
-# displayinmenu=true
-# displaytouser=true
-# displayinselector=true
-from hec.script import *
-from hec.dssgui import *
-from hec.heclib.util import *
+#Use ListSelection to open manual data entry dialog and save to mydb.dss
+
+# from hec.script import Plot, MessageBox, AxisMarker
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+# from hec.heclib.dss import HecDss, DSSPathname
+from hec.dssgui import ListSelection
+from hec.heclib.util import HecTime
 import java
+
+
+
 
 mw = ListSelection.getMainWindow()
 mw.setIsInteractive(1,0)  # Turn off popups
