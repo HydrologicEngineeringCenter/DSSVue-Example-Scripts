@@ -1,11 +1,14 @@
-# name=Coyote
-# displayinmenu=true
-# displaytouser=false
-# displayinselector=true
-from hec.script import *
-from hec.script.Constants import TRUE, FALSE
-from hec.heclib.dss import *
+ï»¿
+#Create a plot and save to .png
+from hec.script import Plot, MessageBox, AxisMarker
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss, DSSPathname
 import java
+from hec.script.Constants import TRUE, FALSE
+
 
 #  grid pattern - 2 solid pixels followed by 8 blank ones
 dotPat = [2., 8.]
@@ -14,21 +17,21 @@ datasets = []
 
 #  Get the data
 try :
-  dssFile = HecDss.open("C:/temp/sample.dss", "01MAR2006 2400, 30MAR2006 2400")
-  precip = dssFile.get("/EF RUSSIAN/COYOTE/PRECIP-INC/01MAR2006/1HOUR/TB/")
-  datasets.append(precip)
-  stor = dssFile.get("/EF RUSSIAN/COYOTE/STOR-RES EOP/01MAR2006/1HOUR//")
-  datasets.append(stor)
-  topcon = dssFile.get("/EF RUSSIAN/COYOTE/TOP CON STOR/01JAN2006/1DAY//")
-  datasets.append(topcon)
-  inflow = dssFile.get("/EF RUSSIAN/COYOTE/FLOW-RES IN/01MAR2006/1HOUR/SMOOTH/")
-  datasets.append(inflow)
-  outflow = dssFile.get("/EF RUSSIAN/COYOTE/FLOW-RES OUT/01MAR2006/1HOUR//")
-  datasets.append(outflow)
-  ukiah = dssFile.get("/RUSSIAN/NR UKIAH/FLOW/01MAR2006/1HOUR//")
-  datasets.append(ukiah)
-  hopland = dssFile.get("/RUSSIAN/NR HOPLAND/FLOW/01MAR2006/1HOUR//")
-  datasets.append(hopland)
+    dssFile = HecDss.open("C:/temp/sample.dss", "01MAR2006 2400, 30MAR2006 2400")
+    precip = dssFile.get("/EF RUSSIAN/COYOTE/PRECIP-INC/01MAR2006/1HOUR/TB/")
+    datasets.append(precip)
+    stor = dssFile.get("/EF RUSSIAN/COYOTE/STOR-RES EOP/01MAR2006/1HOUR//")
+    datasets.append(stor)
+    topcon = dssFile.get("/EF RUSSIAN/COYOTE/TOP CON STOR/01JAN2006/1DAY//")
+    datasets.append(topcon)
+    inflow = dssFile.get("/EF RUSSIAN/COYOTE/FLOW-RES IN/01MAR2006/1HOUR/SMOOTH/")
+    datasets.append(inflow)
+    outflow = dssFile.get("/EF RUSSIAN/COYOTE/FLOW-RES OUT/01MAR2006/1HOUR//")
+    datasets.append(outflow)
+    ukiah = dssFile.get("/RUSSIAN/NR UKIAH/FLOW/01MAR2006/1HOUR//")
+    datasets.append(ukiah)
+    hopland = dssFile.get("/RUSSIAN/NR HOPLAND/FLOW/01MAR2006/1HOUR//")
+    datasets.append(hopland)
 except java.lang.Exception, e :
     MessageBox.showError(e.getMessage(), "Error reading data")
 
@@ -53,16 +56,16 @@ plot.configurePlotLayout(layout)
 plot.setLocation(-10000, -10000)
 plot.setSize(1000, 800)
 
-####### Important – showPlot() creates the plot objects ######
+####### Important showPlot() creates the plot objects ######
 # (You cannot set or change things that do not exist yet)
 plot.showPlot()
 
 #  Make the legend labels look nice
 for dataset in datasets:
-	label = plot.getLegendLabel(dataset)
-	label.setFontSize(16)
-	label.setFont("Arial Black,Plain,14")
-	label.setForeground("black")
+    label = plot.getLegendLabel(dataset)
+    label.setFontSize(16)
+    label.setFont("Arial Black,Plain,14")
+    label.setForeground("black")
 
 label = plot.getLegendLabel(precip)
 label.setText( "Basin Precipitation")
