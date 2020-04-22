@@ -1,15 +1,12 @@
-# name=AddTenTsc
-# displayinmenu=true
-# displaytouser=true
-# displayinselector=true
 #  Add 10 to each value using TimeSeriesContainer
 #
-from hec.script import Plot
-from hec.io import TimeSeriesContainer
-#from hec.io import PairedDataContainer"
-#from hec.io import TimeSeriesMath\n"
-#from hec.io import PairedDataMath\n"
-from hec.heclib.dss import HecDss
+from hec.script import Plot, MessageBox
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss, DSSPathname
+import java
 
 
 #  Open the file and get the data
@@ -27,7 +24,12 @@ try:
   outflow.fullName = path.getPathname()
 
   dssFile.put(outflow)
+  print "Done"
 
 except java.lang.Exception, e :
   #  Take care of any missing data or errors
    MessageBox.showError(e.getMessage(), "Error reading data")
+   
+finally:
+  print "Closing DSS File"
+  dssFile.done()
