@@ -1,11 +1,11 @@
-# name=WriteDss
-# displayinmenu=true
-# displaytouser=true
-# displayinselector=true
-from hec.script import *
-from hec.heclib.dss import *
-from hec.heclib.util import *
-from hec.io import *
+#Make TimeSeriesContainer, add values and times, then put
+from hec.script import Plot, MessageBox
+from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss, DSSPathname
+from hec.heclib.util import HecTime
 import java
 
 try : 
@@ -26,10 +26,12 @@ try :
     tsc.units = "CFS"
     tsc.type = "PER-AVER"
     myDss.put(tsc)
+    print "Done"
     
   except Exception, e :
     MessageBox.showError(' '.join(e.args), "Python Error")
   except java.lang.Exception, e :
     MessageBox.showError(e.getMessage(), "Error")
 finally :
+  print "Closing DSS File"
   myDss.close()

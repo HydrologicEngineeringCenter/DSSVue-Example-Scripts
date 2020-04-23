@@ -1,5 +1,3 @@
-
-
 #Run a script with arguments for "location" and "version"
 # this script is run by passing arguments from RunGages.py
 
@@ -8,7 +6,7 @@ from hec.script import Plot, MessageBox
 # from hec.io import PairedDataContainer
 # from hec.hecmath import TimeSeriesMath
 # from hec.hecmath import PairedDataMath
-from hec.heclib.dss import HecDss
+from hec.heclib.dss import HecDss. DSSPathname
 from hec.script.Constants import TRUE, FALSE
 import java
 

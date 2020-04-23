@@ -1,4 +1,3 @@
-
 #  Fill in missing values using HecMath
 #
 from hec.script import Plot, MessageBox

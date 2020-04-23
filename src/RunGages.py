@@ -1,4 +1,4 @@
-#Used to pass arguments and run Gageplot.py
+# Pass arguments and run Gageplot.py
 
 #Set this to path for GagePlot.py
 gplot = "C:/Path/To/GagePlot.py"

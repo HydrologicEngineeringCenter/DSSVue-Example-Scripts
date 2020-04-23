@@ -1,4 +1,10 @@
-from hec.script import *
+# Examples of calling scripts from other scripts
+from hec.script import Plot, MessageBox
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss, DSSPathname
 import time
 import java
 

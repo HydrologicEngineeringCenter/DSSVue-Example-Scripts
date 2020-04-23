@@ -1,9 +1,10 @@
-# name=OakvilleSimple
-# displayinmenu=true
-# displaytouser=true
-# displayinselector=true
-from hec.script import *  # always needed
-from hec.heclib.dss import *  # Used to access HEC-DSS
+# Simple Plotting Example
+from hec.script import Plot, MessageBox
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss, DSSPathname
 import java
 
 #  Open the file and get the data

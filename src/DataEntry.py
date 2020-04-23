@@ -5,7 +5,7 @@ from hec.script import Plot, MessageBox
 # from hec.io import PairedDataContainer
 # from hec.hecmath import TimeSeriesMath
 # from hec.hecmath import PairedDataMath
-# from hec.heclib.dss import HecDss, DSSPathname
+from hec.heclib.dss import HecDss, DSSPathname
 from hec.dssgui import ListSelection
 from hec.heclib.util import HecTime
 import java
