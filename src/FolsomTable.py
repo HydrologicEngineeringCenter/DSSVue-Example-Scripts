@@ -1,13 +1,12 @@
-# name=FolsomTable
-# displayinmenu=false
-# displaytouser=false
-# displayinselector=false
-from hec.script import *
-from hec.script.Constants import TRUE, FALSE
-from hec.heclib.dss import *
+#Create and display a table
+from hec.script import Plot, MessageBox
+from hec.dataTable import HecDataTableFrame
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss
 import java
-from hec.dataTable import *
-
 #  Open the file and get the data
 try:  
   dssFile = HecDss.open("C:/temp/sample.dss", "10MAR2006 2400, 09APR2006 2400")

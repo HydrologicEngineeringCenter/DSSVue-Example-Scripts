@@ -1,9 +1,10 @@
-# name=Glenfir
-# displayinmenu=false
-# displaytouser=false
-# displayinselector=true
-from hec.script import *
-from hec.hecmath import *
+# Create and display a plot
+from hec.script import Plot, MessageBox
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss
 from hec.script.Constants import TRUE, FALSE
 import java
 

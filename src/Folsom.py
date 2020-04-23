@@ -1,11 +1,12 @@
-# name=Folsom
-# displayinmenu=true
-# displaytouser=true
-# displayinselector=true
-from hec.script import *
-from hec.script.Constants import TRUE, FALSE
-from hec.heclib.dss import *
+#Create and Diplay a plot
+from hec.script import Plot, MessageBox
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss
 import java
+from hec.script.Constants import TRUE, FALSE
 
 #  Open the file and get the data
 try:  

@@ -1,18 +1,16 @@
-# name=GagePlot
-# displayinmenu=false
-# displaytouser=false
-# displayinselector=false
-# Both location=name version=ver must be defined as arguments
-# To run:  GagePlot {"location" : "Glenfir", "version" : "OBS"}
-# e.g.,
-#  glenFirArgs  = {"location" : "Glenfir", "version" : "OBS"}
-#  execfile("C:/HecDSSVueDev/HecDssVue/scripts/GagePlot.py", {}, glenFirArgs)
 
-from hec.script import *
-from hec.heclib.dss import *
-import sys
-import java
+
+#Run a script with arguments for "location" and "version"
+# this script is run by passing arguments from RunGages.py
+
+from hec.script import Plot, MessageBox
+# from hec.io import TimeSeriesContainer
+# from hec.io import PairedDataContainer
+# from hec.hecmath import TimeSeriesMath
+# from hec.hecmath import PairedDataMath
+from hec.heclib.dss import HecDss
 from hec.script.Constants import TRUE, FALSE
+import java
 
 # Access arguments
 sm = globals()

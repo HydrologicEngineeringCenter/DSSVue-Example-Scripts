@@ -1,14 +1,13 @@
-# name=RunGages
-# displayinmenu=false
-# displaytouser=false
-# displayinselector=true
-from hec.script import *
+#Used to pass arguments and run Gageplot.py
+
+#Set this to path for GagePlot.py
+gplot = "C:/Path/To/GagePlot.py"
 
 glenFirArgs  = {"location" : "Glenfir", "version" : "OBS"}
-execfile("C:/HecDSSVueDev/HecDssVue/scripts/GagePlot.py", {}, glenFirArgs)
+execfile(gplot, {}, glenFirArgs)
 
-madronArgs   = {"location" : "Madron", "version" : "OBS"}
-execfile("C:/HecDSSVueDev/HecDssVue/scripts/GagePlot.py", {}, madronArgs)
+madronArgs   = {"location" : "Oakville", "version" : "OBS"}
+execfile(gplot, {}, madronArgs)
 
-oakTreeArgs   = {"location" : "Madron", "version" : "OBS"}
-execfile("C:/HecDSSVueDev/HecDssVue/scripts/GagePlot.py", {}, oakTreeArgs)
+oakTreeArgs   = {"location" : "Walnut", "version" : "OBS"}
+execfile(gplot, {}, oakTreeArgs)
