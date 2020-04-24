@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "name": "Launch",
+            // ...
+            "preLaunchTask": "Run Jython", // The name of the task defined above
+            // ...
+        }
+    ]   
+}
