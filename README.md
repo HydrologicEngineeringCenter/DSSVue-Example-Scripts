@@ -1,8 +1,10 @@
 # DSSVue-Ch8-SampleScripts
-This repository is for testing and updating the sample scripts from Chapter 8 of the DSSVue User's Manual.
+This repository contains the sample scripts from Chapter 8 of the DSSVue User's Manual.
 
 https://www.hec.usace.army.mil/confluence/dssvuedocs/latest/appendixc-examplescripts
 
-A batch file runall.bat is used to run all jython files in the directory
 
-note: edit runall.bat to specifiy the location of the runhere.exe as part of the DssVue/CWMS install
+If you are using Visual Studio Code (VsCode) this repo has a tasks.json that makes it very easy
+to run the active jython file in VsCode.  press Ctrl-Shift-B to run the jython file in the active tab.
+
+Please dit scripts/go.bat to point to your installed version of DSSVue/CWMS
