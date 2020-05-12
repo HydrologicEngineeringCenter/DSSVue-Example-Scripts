@@ -1,5 +1,4 @@
-﻿###
-#Create a plot and save to .png
+﻿#Create a plot and save to .png
 from hec.script import Plot, MessageBox, AxisMarker
 # from hec.io import TimeSeriesContainer
 # from hec.io import PairedDataContainer
