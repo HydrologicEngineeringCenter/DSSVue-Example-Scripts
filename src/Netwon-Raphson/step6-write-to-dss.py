@@ -67,4 +67,4 @@ def newton_solver(f,xstart,tolerance):
 x = newton_solver(f1,1,0.0001)
 print("solution = "+str(x))
 
-write_to_dss(f1,-4,4,"/demo/chicago/x-y///v1/",r"c:\temp\func.dss")    
+write_to_dss(f1,-4,4,"/demo/chicago/x-y///v1/",R"c:\temp\func.dss")    
