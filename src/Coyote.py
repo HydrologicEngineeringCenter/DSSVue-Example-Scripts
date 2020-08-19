@@ -160,5 +160,8 @@ prop.setMajorYGridStyle(dotPat)
 #  Now that it is complete, save to a png and close it
 plot.saveToPng("C:/temp/Coyote.png")
 plot.close()
+<<<<<<< HEAD
 
 print("done")
+=======
+>>>>>>> 4ea430015424cabf9020b38786c04a465f38f256

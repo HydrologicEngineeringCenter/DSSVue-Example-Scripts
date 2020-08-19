@@ -1,5 +1,9 @@
 cd %~dp0
+<<<<<<< HEAD
 set J=C:\Programs\CWMS\CWMS-v3.2.1.256\common\exe\runhere.exe jython
+=======
+set J=C:\Programs\CWMS-v3.2.1.256\common\exe\runhere.exe
+>>>>>>> 4ea430015424cabf9020b38786c04a465f38f256
 rem run program  
 ::call %J% jython %1 %2  
 
