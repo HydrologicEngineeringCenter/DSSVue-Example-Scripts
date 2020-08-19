@@ -36,5 +36,3 @@ tsc.type = "INST-VAL"
 dssFile = HecDss.open("myFile.dss")
 dssFile.put(tsc)
 dssFile.done()
-
-print("Hello World")
