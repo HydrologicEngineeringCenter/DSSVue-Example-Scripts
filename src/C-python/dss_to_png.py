@@ -1,4 +1,4 @@
-from datetime import datetime
+#from datetime import datetime
 from pydsstools.heclib.dss import HecDss
 import numpy as np
 
@@ -60,5 +60,5 @@ fig.layout.yaxis2.update({'title': "<b>Discharge, ft<sup>3</sup>/s</b>"})
 
 # save plot
 fig.write_image("sample.png")
-
 #type fig in console to display interactive plot
+fig.write_html("c:/temp/file.html")
