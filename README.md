@@ -1,4 +1,4 @@
-# DSSVue-Ch8-SampleScripts
+# DSSVue-SampleScripts
 This repository contains the sample scripts from Chapter 8 of the DSSVue User's Manual.
 
 https://www.hec.usace.army.mil/confluence/dssvuedocs/latest/appendixc-examplescripts
