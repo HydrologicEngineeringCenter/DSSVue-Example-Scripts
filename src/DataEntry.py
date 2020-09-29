@@ -9,13 +9,13 @@ from hec.heclib.dss import HecDss, DSSPathname
 from hec.dssgui import ListSelection
 from hec.heclib.util import HecTime
 import java
-
+import sys
 
 
 
 mw = ListSelection.getMainWindow()
 mw.setIsInteractive(1,0)  # Turn off popups
-mw.open("C:/temp/mydb.dss")
+mw.open(sys.argv[1] + "\\mydb.dss")
 
 time = HecTime()
 time.setCurrent()

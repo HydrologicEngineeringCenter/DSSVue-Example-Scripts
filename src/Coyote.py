@@ -7,7 +7,7 @@ from hec.script import Plot, MessageBox, AxisMarker
 from hec.heclib.dss import HecDss, DSSPathname
 import java
 from hec.script.Constants import TRUE, FALSE
-
+import sys
 
 #  grid pattern - 2 solid pixels followed by 8 blank ones
 dotPat = [2., 8.]
@@ -16,7 +16,7 @@ datasets = []
 
 #  Get the data
 try :
-    dssFile = HecDss.open("C:/temp/sample.dss", "01MAR2006 2400, 30MAR2006 2400")
+    dssFile = HecDss.open(sys.argv[1] + "\\sample.dss", "01MAR2006 2400, 30MAR2006 2400")
     precip = dssFile.get("/EF RUSSIAN/COYOTE/PRECIP-INC/01MAR2006/1HOUR/TB/")
     datasets.append(precip)
     stor = dssFile.get("/EF RUSSIAN/COYOTE/STOR-RES EOP/01MAR2006/1HOUR//")
@@ -158,10 +158,5 @@ prop.setMajorXGridStyle(dotPat)
 prop.setMajorYGridStyle(dotPat)
 
 #  Now that it is complete, save to a png and close it
-plot.saveToPng("C:/temp/Coyote.png")
+plot.saveToPng(sys.argv[2] + "\\Coyote.png")
 plot.close()
-<<<<<<< HEAD
-
-print("done")
-=======
->>>>>>> 4ea430015424cabf9020b38786c04a465f38f256

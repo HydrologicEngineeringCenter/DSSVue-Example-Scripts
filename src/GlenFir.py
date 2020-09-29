@@ -7,8 +7,9 @@ from hec.script import Plot, MessageBox
 from hec.heclib.dss import HecDss, DSSPathname
 from hec.script.Constants import TRUE, FALSE
 import java
+import sys
 
-dssFile = HecDss.open("C:/temp/sample.dss", "01MAY1992 2400", "20MAY1992 2400")
+dssFile = HecDss.open(sys.argv[1] + "\\sample.dss", "01MAY1992 2400", "20MAY1992 2400")
 flowPath = "/GREEN RIVER/GLENFIR/FLOW//1HOUR/OBS/"
 precipPath = "/GREEN RIVER/GLENFIR/PRECIP-INC//1HOUR/OBS/"
 precip = dssFile.get(precipPath)

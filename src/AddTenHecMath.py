@@ -7,13 +7,13 @@ from hec.script import Plot, MessageBox
 # from hec.hecmath import PairedDataMath
 from hec.heclib.dss import HecDss, DSSPathname
 import java
-
+import sys
 
 
 
 #  Open the file and get the data
 try:  
-  dssFile = HecDss.open("C:/temp/sample.dss", "10MAR2006 2400, 09APR2006 2400")
+  dssFile = HecDss.open(sys.argv[1] + "\\sample.dss", "10MAR2006 2400, 09APR2006 2400")
   outflow = dssFile.read("/AMERICAN/FOLSOM/FLOW-RES OUT/01JAN2006/1DAY/OBS/")
   newOutflow = outflow.add(10.)
 

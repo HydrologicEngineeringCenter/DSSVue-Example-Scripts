@@ -1,10 +1,14 @@
-from hec.script import *
-from hec.heclib.dss import *
-from hec.dataTable import *
+from hec.script import MessageBox
+from hec.heclib.dss import HecDss
+from hec.dataTable import HecDataTableToExcel
 import java
+import sys
+import os
 # Open the file and get the data
 try:
- dssFile = HecDss.open("C:/temp/sample.dss", "10MAR2006 2400, 09APR2006 2400")
+ dir1 = sys.argv[1]
+ dir2 = sys.argv[2]
+ dssFile = HecDss.open(dir1 + "\\sample.dss", "10MAR2006 2400, 09APR2006 2400")
  precip = dssFile.get("/AMERICAN/FOLSOM/PRECIPBASIN/01JAN2006/1DAY/OBS/")
  stor = dssFile.get("/AMERICAN/FOLSOM/ STOR-RES EOP/01JAN2006/1DAY/OBS/")
  topcon = dssFile.get("/AMERICAN/FOLSOM/TOP CON STOR/01JAN2006/1DAY/OBS/")
@@ -28,6 +32,6 @@ list = []
 list.append(datasets)
 table = HecDataTableToExcel.newTable()
 # If you want to run Excel with a specific name and not a temp name:
-table.runExcel(list, "myWorkbook.xls")
+table.createExcelFile(list, dir2 + "\\myWorkbook.xls")
 # Or, if you would just rather create an Excel file, but not run it:
 #table.createExcelFile(datasets, "myWorkbook.xls")

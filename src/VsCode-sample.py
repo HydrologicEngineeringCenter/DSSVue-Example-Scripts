@@ -9,9 +9,8 @@ print( len(sys.argv))
 
 #  relative filename to VSCode workspace directory
 # , assuming running in vscode with .vscode/tasks.json and scripts/go.bat
-if len(sys.argv) == 2:
-  filename=sys.argv[1]+"/data/sample.dss"
-  print("filename = ",filename)
+filename=sys.argv[1]+"\\sample.dss"
+print("filename = ",filename)
   
 
 
@@ -40,5 +39,5 @@ outCurve = plot.getCurve(outflow)
 outCurve.setLineColor("darkgreen")
 
 #  Save the plot and close
-plot.saveToPng("C:/temp/Oakville.png")
+plot.saveToPng(sys.argv[2] + "/Oakville.png")
 #plot.close()  #  Do this if you only want the plot as a .png and not on screen
