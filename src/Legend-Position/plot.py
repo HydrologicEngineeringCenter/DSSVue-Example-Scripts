@@ -102,3 +102,8 @@ plot.setPlotTitleVisible(TRUE)
 #legendLocation = 'Bottom'
 
 plot.setLegendLocation('Viewport Top Left')
+
+plot.setPlotTitleText("DS-19 Most Reasonable PMF - Spillway Crest 1183.6 ft-NAVD88")
+title = plot.getPlotTitle()
+title.setFont("Arial Black")
+title.setFontSize(30)
