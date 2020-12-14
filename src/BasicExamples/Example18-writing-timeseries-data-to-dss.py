@@ -30,4 +30,3 @@ except Exception, e:
 
 finally:
     myDss.close()
-

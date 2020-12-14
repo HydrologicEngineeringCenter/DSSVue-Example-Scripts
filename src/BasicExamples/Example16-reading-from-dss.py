@@ -10,6 +10,7 @@ try :
     plot = Plot.newPlot("Russian River at Ukiah")
     plot.addData(flow)
     plot.showPlot()
+    plot.stayOpen()
   except Exception, e :
     JOptionPane.showMessageDialog(None, ' '.join(e.args), "Python Error", JOptionPane.ERROR_MESSAGE)
   except java.lang.Exception, e :

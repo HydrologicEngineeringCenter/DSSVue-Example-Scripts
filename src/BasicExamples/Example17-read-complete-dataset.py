@@ -12,7 +12,7 @@ try :
     plot = Plot.newPlot("Mississippi")
     plot.addData(flow)
     plot.showPlot()
-
+    plot.stayOpen()
 except Exception, e :
     MessageBox.showError(' '.join(e.args), "Python Error")
 except java.lang.Exception, e :
