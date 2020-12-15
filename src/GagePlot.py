@@ -2,10 +2,6 @@
 # this script is run by passing arguments from RunGages.py
 
 from hec.script import Plot, MessageBox
-# from hec.io import TimeSeriesContainer
-# from hec.io import PairedDataContainer
-# from hec.hecmath import TimeSeriesMath
-# from hec.hecmath import PairedDataMath
 from hec.heclib.dss import HecDss, DSSPathname
 from hec.script.Constants import TRUE, FALSE
 import java
@@ -75,7 +71,7 @@ plot.setLegendLabelText(flow, "Flow")
 plot.setLegendLabelText(precip, "Rainfall")
 
 # Done (should look like we want now)
-
+plot.stayOpen()
 #  If you wanted this to run in the background, you could add the following"
 #  plot.setLocation(-10000, -10000)
 #  plot.saveToPng("C:/temp/GagePlot.png")
