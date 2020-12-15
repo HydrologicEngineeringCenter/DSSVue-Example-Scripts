@@ -1,0 +1,21 @@
+[USGS_PARAMETER],ALIAS
+[00010],Temp-Water
+[00021],Temp-Air
+[00025],Air Pressure
+[00035],Wind Speed
+[00036],Wind Dir
+[00045],Precip
+[00050],Evap
+[00052],RelHumidity
+[00060],Flow
+[00062],Elev-Pool
+[00065],Stage
+[00076],Turbidity
+[00095],Sp Cond
+[00096],Salinity
+[00300],Conc-Oxygen
+[00400],pH
+[62608],Sol Rad
+[63680],Turbidity
+[72036],Res Storage
+
