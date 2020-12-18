@@ -5,9 +5,7 @@ import java
 import sys
 # Open the file and get the data
 try:
- dir1 = sys.argv[1]
- dir2 = sys.argv[2]
- dssFile = HecDss.open(dir1 + "\\sample.dss", "10MAR2006 2400, 09APR2006 2400")
+ dssFile = HecDss.open("c:/temp/sample.dss", "10MAR2006 2400, 09APR2006 2400")
  precip = dssFile.get("/AMERICAN/FOLSOM/PRECIPBASIN/01JAN2006/1DAY/OBS/")
  stor = dssFile.get("/AMERICAN/FOLSOM/ STOR-RES EOP/01JAN2006/1DAY/OBS/")
  topcon = dssFile.get("/AMERICAN/FOLSOM/TOP CON STOR/01JAN2006/1DAY/OBS/")
@@ -30,7 +28,7 @@ datasets.add(outflow)
 list = []
 list.append(datasets)
 table = HecDataTableToExcel.newTable()
-table.createExcelFile(list, dir2 + "\\myWorkbook.xlsx")
+table.createExcelFile(list, "c:/temp/folsom-export.xlsx")
 # If you want to run Excel with a specific name and not a temp name:
 #table.runExcel(list "myWorkbook.xls")
 # Or, if you would just rather create an Excel file, but not run it:
