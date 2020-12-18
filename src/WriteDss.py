@@ -1,16 +1,13 @@
 #Make TimeSeriesContainer, add values and times, then put
 from hec.script import Plot, MessageBox
 from hec.io import TimeSeriesContainer
-# from hec.io import PairedDataContainer
-# from hec.hecmath import TimeSeriesMath
-# from hec.hecmath import PairedDataMath
 from hec.heclib.dss import HecDss, DSSPathname
 from hec.heclib.util import HecTime
 import java
 import sys
 
 try:
-  myDss = HecDss.open(sys.argv[1] + "\\test.dss")
+  myDss = HecDss.open("c:/temp/test.dss")
   tsc = TimeSeriesContainer()
   tsc.fullName = "/BASIN/LOC/FLOW//1HOUR/OBS/"
   start = HecTime("04Sep1996", "1330")
