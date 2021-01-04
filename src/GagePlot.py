@@ -1,5 +1,13 @@
-#Run a script with arguments for "location" and "version"
+#The GagePlot script is designed to produce a standard plot for a gage
+# where there is both a stream flow gage and a precipitation gage.
+
 # this script is run by passing arguments from RunGages.py
+# To access arguments passed into the script you must include the following:
+# import sys (sm = globals())
+# Arguments are passed into a python script using a "name-space dictionary", which gives the keyword followed by a colon and then the parameter. Inside the script, the keyword will be replaced with the parameter. For example, in the GagePlot script, the name-space dictionary could be:
+# "location" : "Glenfir", "version" : "OBS"
+# Wherever the string location or version is in the script will
+#  be substituted with GlenFir and Obs, respectively. 
 
 from hec.script import Plot, MessageBox
 from hec.heclib.dss import HecDss, DSSPathname

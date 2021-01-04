@@ -1,10 +1,10 @@
 #Create and display a table
+#Creating a table from a script is easier than plots as 
+# there is less to do. Like plots, you retrieve the data, 
+# add the data to a Vector, create a table and set the data, 
+# and then show the table.
 from hec.script import Plot, MessageBox
 from hec.dataTable import HecDataTableFrame
-# from hec.io import TimeSeriesContainer
-# from hec.io import PairedDataContainer
-# from hec.hecmath import TimeSeriesMath
-# from hec.hecmath import PairedDataMath
 from hec.heclib.dss import HecDss
 import java
 import sys

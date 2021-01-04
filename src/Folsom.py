@@ -1,9 +1,11 @@
 #Create and Diplay a plot
+# This example shows a more complex plot where we break the rule of 
+# showPlot() of creating the plot prior to changing it. 
+# In this case, configurePlotLayout() will also create the plot. 
+# In this plot of Folsom Lake, we create three separate viewports 
+# and size them according to the different data types.
 from hec.script import Plot, MessageBox
-# from hec.io import TimeSeriesContainer
-# from hec.io import PairedDataContainer
-# from hec.hecmath import TimeSeriesMath
-# from hec.hecmath import PairedDataMath
+
 from hec.heclib.dss import HecDss
 import java
 from hec.script.Constants import TRUE, FALSE

@@ -1,9 +1,10 @@
 ﻿#Create a plot and save to .png
+#Note: An important detail to keep in mind is that you need to call 
+# showPlot() early on. Scripting emulates what you would do interactively;
+# it is not a "command driven" procedure. You cannot change features on 
+# a plot until they exist and the showPlot() function causes the plot 
+# object to come into existence.
 from hec.script import Plot, MessageBox, AxisMarker
-# from hec.io import TimeSeriesContainer
-# from hec.io import PairedDataContainer
-# from hec.hecmath import TimeSeriesMath
-# from hec.hecmath import PairedDataMath
 from hec.heclib.dss import HecDss, DSSPathname
 import java
 from hec.script.Constants import TRUE, FALSE
