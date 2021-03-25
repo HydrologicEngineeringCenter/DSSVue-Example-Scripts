@@ -1,5 +1,7 @@
-from hec.script import *
-from hec.dssgui import *
+#from hec.script import Plot, MessageBox
+#from hec.heclib.dss import HecDss, DSSPathname
+from hec.dssgui import ListSelection
+
 import java
 ls = ListSelection.getMainWindow()
 ls.setIsInteractive(1,0) # Turn off popups
