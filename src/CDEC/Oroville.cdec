@@ -1,0 +1,25 @@
+CDEC Data Retrieval
+
+Station Name=OROVILLE
+Basin Name= 
+Station ID=ORO
+Sensor Name= ELEVATION-RESERVOIR
+Version Name= CDEC
+Sensor Number=6
+Duration Code=Daily
+
+Station Name=OROVILLE
+Basin Name=
+Station ID=ORO
+Sensor Name= STORAGE
+Version Name= CDEC
+Sensor Number=15
+Duration Code=Daily
+
+Station Name=OROVILLE
+Basin Name=
+Station ID=ORO 
+Sensor Name= RESERVOIR INFLOW
+Version Name= CDEC
+Sensor Number=76
+Duration Code=Daily
