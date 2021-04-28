@@ -8,6 +8,7 @@ import urllib
 import datetime
 import time
 import csv
+from optparse import OptionParser
 ###################################
 from hec.script import Plot, MessageBox
 from hec.io import TimeSeriesContainer
@@ -17,6 +18,25 @@ from hec.io import TimeSeriesContainer
 from hec.heclib.dss import HecDss, DSSPathname
 from hec.heclib.util import HecTime
 import java
+
+parser = OptionParser()
+
+###NOAA options
+parser.add_option("-g", "--gage_name", action="store", type="string", dest="gage_name")
+parser.add_option("-n", "--gage_number", action="store", type="int", dest="gage_number")
+parser.add_option("-p", "--product", action="store", type="string", dest="product", default="water_level")
+parser.add_option("-i", "--interval", action="store", type="string", dest="interval", default="60")
+parser.add_option("-u", "--units", action="store", type="string", dest="units", default="english")
+parser.add_option("-t", "--timezone", action="store", type="string", dest="timezone", default="gmt")
+parser.add_option("-d", "--datum", action="store", type="string", dest="datum", default="NAVD")
+
+###Timeseries container options
+parser.add_option("-N", "--tscn", action="store", type="string", dest="tsc_fullName", default="")
+parser.add_option("-U", "--tscu", action="store", type="string", dest="tsc_units", default="FEET")
+parser.add_option("-T", "--tsct", action="store", type="string", dest="tsc_type", default="INST-VAL")
+
+(options, args) = parser.parse_args()
+
 def forecastGoM(begin_date, 
                 end_date, 
                 station,
@@ -41,7 +61,6 @@ def forecastGoM(begin_date,
     full_url= url+'?'+url_values
     print ("Using URL:   ", full_url)
     data=urllib.urlretrieve(full_url)
-    #urllib.urlretrieve(full_url, url_values+'.csv') Not sure what this line is doing
     return data
 
 def csvParseToLists(csvFile):
@@ -75,12 +94,12 @@ startStr = startD.strftime("%Y%m%d %H:00")
 # forecastGoM returns a tuple, first item is the location of the temp file.
 csvTempLocation = forecastGoM(startStr,
                                endStr,
-                                8764227,
-                                "water_level",
-                                "",
-                                "english",
-                                "gmt",
-                                "NAVD")[0]
+                                options.gage_number,
+                                options.product,
+                                options.interval,
+                                options.units,
+                                options.timezone,
+                                options.datum)[0]
                                                                 
 dateList, valueList = csvParseToLists(csvTempLocation)
 # Trying to trash the temp files when done with them
@@ -88,15 +107,14 @@ urllib.urlcleanup()
 #convert strings to HecTimes
 hecDates = hecTimeParser(dateList)
 try :
-    myDss = HecDss.open("C:/temp/test.dss", 6)
+    myDss = HecDss.open(options.gage_name+".dss", 6)
     tsc = TimeSeriesContainer()
-    tsc.fullName = "/Lower Miss/Amerada Pass/STAGE//6MIN/OBS/"
-    tsc.interval = 6
+    tsc.fullName = options.tsc_fullName
     tsc.numberValues= len(valueList)
     tsc.values = valueList
     tsc.times=hecDates
-    tsc.units = "FEET"
-    tsc.type = "INST-VAL"
+    tsc.units =  options.tsc_units
+    tsc.type =  options.tsc_type
     myDss.put(tsc)
     myDss.done()
     print "Done"
