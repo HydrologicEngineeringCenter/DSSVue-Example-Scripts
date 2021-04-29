@@ -1,4 +1,14 @@
 #Description : Downloads CSV for Tides from NOAA and parses to DSS
+#Instructions : This script can be used from the command line using 
+#               the parser options described below.
+#    <command> <filename> <options>
+# ie: "jython NOAATidesCSVToDSS.py -g amerada -n 8764227"
+# copy and paste the line above (without quotes) into the command line while 
+# within the directory containing the NOAATidesCSVToDss.py script.
+#
+# The only option that does not have a default is gage_number or -n
+# This must be provided.
+#
 ###############################
 import urllib
 # import urllib.parse
@@ -22,8 +32,8 @@ import java
 parser = OptionParser()
 
 ###NOAA options
-parser.add_option("-g", "--gage_name", action="store", type="string", dest="gage_name")
 parser.add_option("-n", "--gage_number", action="store", type="int", dest="gage_number")
+parser.add_option("-g", "--gage_name", action="store", type="string", dest="gage_name", default="gage"))
 parser.add_option("-p", "--product", action="store", type="string", dest="product", default="water_level")
 parser.add_option("-i", "--interval", action="store", type="string", dest="interval", default="60")
 parser.add_option("-u", "--units", action="store", type="string", dest="units", default="english")
@@ -37,14 +47,14 @@ parser.add_option("-T", "--tsct", action="store", type="string", dest="tsc_type"
 
 (options, args) = parser.parse_args()
 
-def forecastGoM(begin_date, 
-                end_date, 
-                station,
-                product,
-                interval, 
-                units, 
-                time_zone, 
-                datum):
+def NOAA_gage_data_request(begin_date, 
+                           end_date, 
+                           station,
+                           product,
+                           interval, 
+                           units, 
+                           time_zone, 
+                           datum):
     option={}
     option['begin_date']=begin_date
     option['end_date']=end_date
