@@ -102,7 +102,7 @@ startD = endD-(datetime.timedelta(hours=2))
 startStr = startD.strftime("%Y%m%d %H:00")
 
 # forecastGoM returns a tuple, first item is the location of the temp file.
-csvTempLocation = forecastGoM(startStr,
+csvTempLocation = NOAA_gage_data_request(startStr,
                                endStr,
                                 options.gage_number,
                                 options.product,
