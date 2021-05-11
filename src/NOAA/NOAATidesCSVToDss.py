@@ -33,7 +33,7 @@ parser = OptionParser()
 
 ###NOAA options
 parser.add_option("-n", "--gage_number", action="store", type="int", dest="gage_number")
-parser.add_option("-g", "--gage_name", action="store", type="string", dest="gage_name", default="gage"))
+parser.add_option("-g", "--gage_name", action="store", type="string", dest="gage_name", default="gage")
 parser.add_option("-p", "--product", action="store", type="string", dest="product", default="water_level")
 parser.add_option("-i", "--interval", action="store", type="string", dest="interval", default="60")
 parser.add_option("-u", "--units", action="store", type="string", dest="units", default="english")
