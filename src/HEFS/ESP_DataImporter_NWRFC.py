@@ -2,13 +2,14 @@
 # displayinmenu=true
 # displaytouser=true
 # displayinselector=true
-from  javax.swing		import JOptionPane
+from  javax.swing	import JOptionPane
 from  java.util		import ArrayList
 from hec.heclib.dss	import HecDss
 from hec.heclib.util 	import HecTime
-from hec.hecmath		import TimeSeriesMath
-from hec.io			import TimeSeriesContainer
-from urllib2 			import urlopen
+from hec.hecmath	import TimeSeriesMath
+from hec.io		import TimeSeriesContainer
+from hec.script		import Constants
+from urllib2 		import urlopen
 import csv
 
 def readCSV(fileName):
@@ -59,7 +60,7 @@ def createTemplateTSC(rawDataList):
 	hecTimes.append(Dates[-1]) 
 	interval_hours = int(interval)/60
 	tsc.times = hecTimes
-	tsc.values = [0]*len(times) #add null data number here.
+	tsc.values = [Constants.UNDEFINED]*len(times) #add null data number here.
 	tsc.interval = interval_hours
 	tsc.startTime =(int(hecStartTime.julian())*1440)+1080
 	tsc.endTime =(int( hecEndTime.julian())*1440)+1080
