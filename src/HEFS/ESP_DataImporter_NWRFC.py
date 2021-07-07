@@ -239,7 +239,10 @@ for i in range(len(GoI_NoSpace)):
 	GagesUsed = []
 	GagesToDownload(EspDaysCSV)
 
-	CheckOnSpelling(GagesUsed)
+	#CheckOnSpelling(GagesUsed)
+	#Want to use a function to throw an exception if the infroamtion the user inputted is not within the list.
+	#This is not working at this time, so if the user does not type the location in like denoted in the list, an error in the script will occur
+	# and is only visible in the console. This error is not the best if the user does not understand how the code is working and parsing the data.
 	
 	ESP_TraceOfInterest = GagesUsed[i]
 	webrequest = NorthWestRFT_URL+GagesUsed[i]
