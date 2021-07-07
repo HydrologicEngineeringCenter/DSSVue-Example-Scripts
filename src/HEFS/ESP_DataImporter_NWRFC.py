@@ -190,7 +190,7 @@ elif DssFileLocation == "Same as Open DSS File":
 	#Want this to be able to automatically direct to the open DSS file. 
 GagesOfInterest = JOptionPane.showInputDialog( "Please input the gage identifiers (seperate with a common for multiple locations")
 #GagesOfInterest = "ABOM8N, AGNO3N, PRPI1N"
-GagesOfInterest = GagesOfInterest .rsplit(',',2)
+GagesOfInterest = GagesOfInterest .rsplit(',')
 
 GoI_NoSpace = []
 for i in range(len(GagesOfInterest)):
