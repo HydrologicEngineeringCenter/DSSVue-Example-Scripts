@@ -16,36 +16,29 @@ def readFromDss(filename,Fpart, startTime, endTime) :
 	FOL07_DamLeakageOverflow = dss.read("//FOLSOM-DAM L&O/FLOW-DECISION//1HOUR/" + Fpart + "/").add(FOL06_DikesOverflow)	
 
 	d1 = {'FOL07_DamLeakageOverflow': FOL07_DamLeakageOverflow.getData(),
-	      'FOL06_DikesOverflow':FOL06_DikesOverflow, 
-		  'FOL05_EmergentySpillway' : FOL04_MainSpillway,
-						'FOL03_PowerPlantOut': FOL03_PowerPlantOut,
-						'FOL02_UpperTierOut':FOL02_UpperTierOut, 
-						 'FOL01_LowerTierOut': FOL01_LowerTierOut
+	      'FOL06_DikesOverflow':FOL06_DikesOverflow.getData(), 
+		  'FOL05_EmergentySpillway' : FOL05_EmergentySpillway.getData(),
+		  'FOL04_MainSpillway':FOL04_MainSpillway.getData(),
+		  'FOL03_PowerPlantOut': FOL03_PowerPlantOut.getData(),
+		  'FOL02_UpperTierOut':FOL02_UpperTierOut.getData(), 
+		  'FOL01_LowerTierOut': FOL01_LowerTierOut.getData()
 		  }
-	outflowCurves = [	FOL07_DamLeakageOverflow.getData(), FOL06_DikesOverflow.getData(), 
-						FOL05_EmergentySpillway.getData(), FOL04_MainSpillway.getData(),
-						FOL03_PowerPlantOut.getData(),
-						FOL02_UpperTierOut.getData(),  FOL01_LowerTierOut.getData()		]
 
-
-	return outflowCurves
+	return d1
 
 def plot_outflowCurves( outflowCurves , curveProperties) :
 
 	thePlot = Plot.newPlot("Outflow Curves")
 	layout = Plot.newPlotLayout()
-
 	folView = layout.addViewport()
 
-
-	folViewDC = []
-	for i in range(len(outflowCurves)) :
-		dc =  outflowCurves[i] #.getData()
-		folViewDC.append(dc)
-
-  	
-	for x in range(len(outflowCurves)) :
-		folView.addCurve("Y1", outflowCurves[x])
+	propNames = curveProperties.get('key')
+	propKeys = curveProperties.keys()
+	propKeys.sort(reverse=True)
+	for k in propKeys :
+		row = curveProperties[k]
+		curve = row[propNames.index('CurveData')]
+		folView.addCurve("Y1", curve)  
 
 	folView.setAxisName("Y1" , "Folsom")
 
@@ -66,8 +59,8 @@ def plot_outflowCurves( outflowCurves , curveProperties) :
 
 	propKeys = curveProperties.keys()
 	print propKeys
-	propKeys.sort()
-	print propKeys
+#	propKeys.sort()
+#	print propKeys
 	propNames = curveProperties.get('key')
 	
 	for key in propKeys :
@@ -99,24 +92,24 @@ def go():
   startTime = "18Jan1986 2400"
   endTime = "18Mar1986 2400"
 
-  outflowCurves = readFromDss(forecastDSSFileName,"E504-NAT--0",startTime, endTime)
+  d1 = readFromDss(forecastDSSFileName,"E504-NAT--0",startTime, endTime)
 
   config = {
 	#	key							Curve					LineColor			LineStyle		LineWeight		SymbolsVisible		SymbolType		SymbolSize				SymbolLineColor		SymbolFillColor		SymbolInterval		SymbolSkipCount		FirstSymbolOffset
 	#	----------------			----------------		----------------	------------	----------		-----------------	------------	---------------------	----------------	----------------	----------------	----------------	-----------------
-	    'key'						: ['Curve',				'LineColor'        , 'LineStyle',  'LineWeight',	'SymbolsVisible',    'SymbolType',	'SymbolSize',           'SymbolLineColor',	'SymbolFillColor',	'SymbolInterval', 'SymbolSkipCount',	'FirstSymbolOffset'],
+	    'key'						: ['CurveData',				'LineColor'        , 'LineStyle',  'LineWeight',	'SymbolsVisible',    'SymbolType',	'SymbolSize',           'SymbolLineColor',	'SymbolFillColor',	'SymbolInterval', 'SymbolSkipCount',	'FirstSymbolOffset'],
 #	----------------			----------------		----------------	------------	----------		-----------------	------------	---------------------	----------------	----------------	----------------	----------------	-----------------
-		'FOL07_DamLeakageOverflow'	: [ outflowCurves[0],	'lightgray'			, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
-		'FOL06_DikesOverflow'		: [ outflowCurves[1],	'black'				, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
-		'FOL05_EmergentySpillway'	: [ outflowCurves[2],	'red'				, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
-		'FOL04_MainSpillway'		: [ outflowCurves[3],	'orange'			, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
-		'FOL03_PowerPlantOut'		: [ outflowCurves[4],	'darkgreen'			, 'solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
-		'FOL02_UpperTierOut'		: [ outflowCurves[5],	'lightblue'			, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
-		'FOL01_LowerTierOut'		: [ outflowCurves[6],	'lightgreen'		, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
+		'FOL07_DamLeakageOverflow'	: [ d1['FOL07_DamLeakageOverflow'],	'lightgray'			, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
+		'FOL06_DikesOverflow'		: [ d1['FOL06_DikesOverflow'],	    'black'				, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
+		'FOL05_EmergentySpillway'	: [ d1['FOL05_EmergentySpillway'],	'red'				, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
+		'FOL04_MainSpillway'		: [ d1['FOL04_MainSpillway'],		'orange'			, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
+		'FOL03_PowerPlantOut'		: [ d1['FOL03_PowerPlantOut'],		'darkgreen'			, 'solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
+		'FOL02_UpperTierOut'		: [ d1['FOL02_UpperTierOut'],		'lightblue'			, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
+		'FOL01_LowerTierOut'		: [ d1['FOL01_LowerTierOut'],		'lightgreen'		, 'Solid'		, 2				, Constants.FALSE	, 'none'		, Constants.UNDEFINED	, 'none'			, 'none'			, 0					, 0					, 0				] ,
 			}
 
 
-  plot_outflowCurves( outflowCurves, config )
+  plot_outflowCurves( d1, config )
 
 
 
