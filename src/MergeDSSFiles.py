@@ -1,11 +1,7 @@
-# from hec.script import Plot, MessageBox
-# from hec.io import TimeSeriesContainer
 from hec.heclib.dss import HecDss, DSSPathname, HecDSSUtilities
-from hec.heclib.util import HecTime
-#import java
+from hec.heclib.util import HecTime, Heclib
 import sys
-#import glob,os
-import os
+import os, time
 
 
 def getDssFiles(dir):
@@ -18,15 +14,22 @@ def getDssFiles(dir):
         rval.append(fn)
  return rval
 
-dir = "c:/temp/"
+dir = "c:/temp/a/"
 files = getDssFiles(dir)
-outputFileName = R"c:\temp\result.dss"
+Heclib.zset("MLVL", "", 0) 
+outputFileName = R"c:\temp\result6.dss"
+if os.path.exists(outputFileName):
+  os.remove(outputFileName)
+HecDss.open(outputFileName,6)
 for f in files:
     print("processing. "+f)
+    start = time.time()
     dss = HecDSSUtilities()
     dss.setDSSFileName(f)
     dss.copyFile(outputFileName)
     dss.done()
+    end = time.time()
+    print(end-start)
 
 print("done.")
 print ("press enter to exit.")

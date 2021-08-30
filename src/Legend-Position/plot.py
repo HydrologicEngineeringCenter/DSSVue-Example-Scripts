@@ -4,7 +4,7 @@ from hec.gfx2d import LegendPanel
 import java
 from hec.script.Constants import TRUE, FALSE
 
-path='C:/project/DSSVue-Ch8-Example-Scripts/src/Legend-Position/'
+path='C:/project/DSSVue-Example-Scripts/src/Legend-Position/'
 
 dssFile=HecDss.open(path+"7_PMF_P50_fc_H250.dss", "02Jan2000 0600", "03Jan2000 0600")
 
@@ -27,6 +27,7 @@ datasets.append(Q_out400); datasets.append(Elev_400)
 datasets.append(Q_out550); datasets.append(Elev_550)
 
 plot=Plot.newPlot("DS-19 Most Reasonable PMF - Adopted")
+plot.stayOpen()
 layout=Plot.newPlotLayout()
 TopView=layout.addViewport(30.)
 #lp = LegendPanel(None,LegendPanel.VERTICAL_LAYOUT)
@@ -65,6 +66,7 @@ plot.configurePlotLayout(layout)
 plot.setSize(700,1000)
 
 plot.showPlot()
+plot.stayOpen()
 
 plot.getLegendLabel(Precip.getData()).setText("PMF Precipitation (5-min)")
 plot.getLegendLabel(Q_in250.getData()).setText("PMF Inflow")
