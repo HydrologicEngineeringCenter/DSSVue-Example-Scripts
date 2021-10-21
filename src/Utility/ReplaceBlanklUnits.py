@@ -7,10 +7,18 @@ dss = HecDss.open("C:/temp/ensemble_test1.dss")
 paths = dss.getPathnameList()
 for p in paths:
     o = dss.get(p)
-    if isinstance(o ,TimeSeriesContainer) or isinstance(o ,PairedDataContainer):
+    if isinstance(o ,TimeSeriesContainer) 
         print("units: '" + o.units+"'")
         if o.units is None or o.units.strip() == '':
             o.units = 'kcfs'
+            dss.put(o)
+    if isinstance(o ,PairedDataContainer) 
+        print("units: '" + o.yunits+"'")
+        if o.units is None or o.xunits.strip() == '':
+            o.xunits = 'x'
+            o.yunits = 'kcfs'
+            #o.xtype =
+            #o.ytype=
             dss.put(o)
 
 dss.done()
