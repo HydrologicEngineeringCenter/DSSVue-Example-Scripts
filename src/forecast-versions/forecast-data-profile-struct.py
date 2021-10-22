@@ -87,15 +87,11 @@ dss_filename = R"C:\project\DSSVue-Example-Scripts\data\forecast_data.dss"
 
 dss = HecDss.open(dss_filename)
 tscC = getContainers(dss,'T:2021.09.01-0600')
-pathName="//GAPT/Version-Flow-Out//1Day/T:2021.09.01-0600|Fcst-MRBWM-GRFT/"
 pathName="//GAPT/Version-Flow-Out//6Hour/T:2021.09.01-0600|Fcst-MRBWM-GRFT/"
 profile = packageAsProfile(tscC,pathName)
 HecDataManager.setMessageLevel(15)  
 dss.put(profile)
 
-
-1/0
-#	dss.put(tsc)
 dss.close()
 
 
