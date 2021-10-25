@@ -75,6 +75,7 @@ def packageAsProfile(tscC, pathName):
 	rval.setStartTime(tsc1.startHecTime)
 	rval.setProfile(profileDepths, profileValues)
 	rval.setProfileDepthsUnits(tsc1.units)
+	#rval.units = tsc1.units
 	rval.setProfileValuesUnits(tsc1.units)
 	rval.setType("Inst-Val")
 	rval.profileLabel="profile - label -here"
@@ -89,7 +90,11 @@ dss = HecDss.open(dss_filename)
 tscC = getContainers(dss,'T:2021.09.01-0600')
 pathName="//GAPT/Version-Flow-Out//6Hour/T:2021.09.01-0600|Fcst-MRBWM-GRFT/"
 profile = packageAsProfile(tscC,pathName)
-HecDataManager.setMessageLevel(15)  
+dss.put(profile)
+
+tscC = getContainers(dss,'T:2021.10.01-0600')
+pathName="//GAPT/Version-Flow-Out//6Hour/T:2021.10.01-0600|Fcst-MRBWM-GRFT/"
+profile = packageAsProfile(tscC,pathName)
 dss.put(profile)
 
 dss.close()
