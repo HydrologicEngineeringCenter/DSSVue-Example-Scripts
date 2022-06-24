@@ -38,8 +38,8 @@ printTSC(tsc2)
 # set lat/lon and vertical datum
 tsc = createTSC()
 tsc.setLatLong(123.45,67.89)
-tsc.verticalDatum = 1
-tsc.verticalUnits =1  # 1=feet, 2=meters
+tsc.verticalDatum = 1 #  0 - unset, 1 - NAVD88 2 - NGVD29
+tsc.verticalUnits =2  # 1=feet, 2=meters
 dss.put(tsc)
 tsc2 = dss.get(path)
 printTSC(tsc2)
@@ -49,7 +49,7 @@ printTSC(tsc2)
 tsc = createTSC()
 tsc.setLatLong(-123.45,-67.89)
 tsc.verticalDatum = 2
-tsc.verticalUnits = 2  # 1=feet, 2=meters
+tsc.verticalUnits = 1  # 1=feet, 2=meters
 dss.put(tsc)
 tsc2 = dss.get(path)
 printTSC(tsc2)
