@@ -1,7 +1,11 @@
 from hec.script import Plot
-from hec.io import TimeSeriesCollectionContainer
+from hec.io import TimeSeriesCollectionContainer,TimeSeriesContainer
 from hec.heclib.dss import HecDss, DSSPathname,HecTimeSeries
+from hec.gfx2d import G2dDialog, DssVueSimpleDSSTimeSeriesCollection
+
+from java.util import Vector
 import sys
+
 
 dss = HecTimeSeries()
 tscc = TimeSeriesCollectionContainer()
@@ -12,11 +16,13 @@ istatus = dss.read(tscc, True)
 print istatus
 # add close parentheses after method
 print tscc.size()
-plot = Plot.newPlot("Test")
 
+sts = DssVueSimpleDSSTimeSeriesCollection(tscc)
 
-for i in range(tscc.size()):
-  plot.addData(tscc.get(i))
+data=Vector()
+data.add(sts)
+plot = G2dDialog(None,"Collections test",False,data)
+
 
 plot.showPlot()
 
