@@ -9,6 +9,7 @@ path ="/time-series////5Minute//"
 print("filename: "+fileName)
 dss = HecDss.open(fileName)
 tsc = dss.get(path)
+print(tsc.getFullName())
 tsc.printToConsole()
 tsm = TimeSeriesMath(tsc)
 # transformTimeSeries(string timeInterval, string timeOffset, string functionType)
@@ -18,6 +19,8 @@ tsm = TimeSeriesMath(tsc)
 # "ACC" for accumulation over interval
 ts_15min = tsm.transformTimeSeries("15Min","0Minutes","INT").getContainer()
 ts_15min.printToConsole()
-
+print("hi")
+print(ts_15min.getFullName())
+dss.put(ts_15min)
 # alternate method that uses dataType to determine function type argument
 #interpolateDataAtRegularInterval(timeInterval, timeOffset) 
