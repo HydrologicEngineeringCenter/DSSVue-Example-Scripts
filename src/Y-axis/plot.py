@@ -17,6 +17,8 @@ HART1 = dss.get("/SAVANNAH/HARTWELL/ELEV-POOL/01JAN2019/1HOUR/OBS/")
 RUSS1 = dss.get("/SAVANNAH/RUSSELL/ELEV-POOL/01JAN2019/1HOUR/OBS/")
 THUR1 = dss.get("/SAVANNAH/THURMOND/ELEV-POOL/01JAN2019/1HOUR/OBS/")
 # need to outsmart gfx2d -- make units differnet so there are separate y-axis values.
+# another workaround reported:is to use setAxisName and setAxisLabel after defining the viewport
+#
 HART1.units +="1"
 RUSS1.units +="2"
 THUR1.units +="3"
