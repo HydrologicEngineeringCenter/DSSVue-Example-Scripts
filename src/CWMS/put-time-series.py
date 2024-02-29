@@ -9,12 +9,6 @@ import DBAPI
 from hec.io import TimeSeriesContainer
 from hec.heclib.util import HecTime
 
-from java.lang.reflect import Array
-from java.lang import  Integer,Double
-
-
-import java
-
 def createHourlyContainer(tsid,size):
 	t1 = HecTime('31Dec2009', '24:00')
 	times = []
