@@ -9,13 +9,14 @@ A script to convert all HEC-DSS v6 files in a directory tree to HEC-DSS v7.
 
 Version history:
 1.0     2024-03-13  MDP     Original version
-1.1     2024-07-05  MDP     Move v6 files to archive directory
+1.1     2024-07-05  MDP     Improved interaction with CAVI
+                            Move v6 files to archive directory
                             Allow closing via "X" window
                             Change log file naming
-                            Use application-specific log director
+                            Use application-specific log directory
                             Put log files on menu
                               - CAVI: Tools->Logs
-                              - CWMS-VUE, DSSVue: Advanced->Logs
+                              - CWMS-VUE, DSSVue: Advanced->Output
 
 Developers
 MDP     Mike Perryman, USACE Hydrologic Engineering Center
