@@ -275,6 +275,8 @@ class DssConverterFrame(JFrame, ActionListener):
         springLayout.putConstraint(SpringLayout.NORTH, self.lblFilesCount, 0, SpringLayout.NORTH, lblFiles)
         springLayout.putConstraint(SpringLayout.WEST, self.lblFilesCount, 6, SpringLayout.EAST, self.pbFiles)
         springLayout.putConstraint(SpringLayout.EAST, self.lblFilesCount, 110, SpringLayout.EAST, self.pbFiles)
+        preferredSize = self.lblFilesCount.getPreferredSize()
+        self.lblFilesCount.setPreferredSize(Dimension(preferredSize.width+20, preferredSize.height))
         self.getContentPane().add(self.lblFilesCount)
         self.lblFilesCount.setText("")
         
@@ -283,6 +285,8 @@ class DssConverterFrame(JFrame, ActionListener):
         springLayout.putConstraint(SpringLayout.WEST, self.lblBytesCount, 6, SpringLayout.EAST, self.pbBytes)
         springLayout.putConstraint(SpringLayout.SOUTH, self.lblBytesCount, 0, SpringLayout.SOUTH, lblBytes)
         springLayout.putConstraint(SpringLayout.EAST, self.lblBytesCount, 0, SpringLayout.EAST, self.lblFilesCount)
+        preferredSize = self.lblBytesCount.getPreferredSize()
+        self.lblBytesCount.setPreferredSize(Dimension(preferredSize.width+20, preferredSize.height))
         self.getContentPane().add(self.lblBytesCount)
         self.lblBytesCount.setText("")
         
@@ -411,9 +415,11 @@ class DssConverterFrame(JFrame, ActionListener):
         ifltab = array.array('i', 800*[0])
         status = [0]
         for dss_file in dss_files :
+            self.log("Adding DSS file {}".format(dss_file))
             Heclib.zopen(ifltab, dss_file, status)
             dss_version = ifltab[0]
             Heclib.zclose(ifltab)
+            self.log("...DSS v{}".format(dss_version))
             self.file_versions[dss_file] = dss_version
             if dss_version == 6 :
                 self.files_to_convert += 1
@@ -499,6 +505,9 @@ class DssConverterFrame(JFrame, ActionListener):
         self.btnExitCancel.setEnabled(False)
         source = e.getSource()
         try :
+            #--------------------#
+            # Choose a directory #
+            #--------------------#
             initial_directory = None
             choosing_archive = source == self.btnTopLevelArchDir
             if choosing_archive :
@@ -513,13 +522,17 @@ class DssConverterFrame(JFrame, ActionListener):
                     initial_directory = os.path.split(self.top_level_archive_dir)[0]
             chooser = DirectoryChooser(initial_directory, archive=choosing_archive)
             directory = chooser.chooseDirectory(self)
+            if directory :
+                directory = os.path.abspath(os.path.normpath(directory))
+                if not directory.endswith(os.sep) :
+                    directory += os.sep
             chooser.dispose()
             del(chooser)
             if directory :
                 if choosing_archive :
-                    #--------------------------#
-                    # Choose archive directory #
-                    #--------------------------#
+                    #----------------------------#
+                    # Choosing archive directory #
+                    #----------------------------#
                     self.top_level_archive_dir = directory
                     self.log("Selected top level archive directory {}".format(self.top_level_archive_dir))
                     if not os.path.exists(self.top_level_archive_dir) :
@@ -533,45 +546,53 @@ class DssConverterFrame(JFrame, ActionListener):
                             self.log("Created directory {}".format(self.top_level_archive_dir))
                         else :
                             self.log("Selected top level archive directiry does not exist and was not created")
-                            self.top_level_archive_dir = None
-                    if self.top_level_archive_dir :
-                        if os.path.isdir(self.top_level_archive_dir) :
-                            if Files.isSameFile(Paths.get(self.top_level_source_dir), Paths.get(self.top_level_archive_dir)) :
-                                self.log("ERROR - top level source and archive directories may not be the same")
-                                self.top_level_archive_dir = None
-                            else :
-                                self.tfTopLevelArchDir.setText(self.top_level_archive_dir)
-                        else :
                             self.log("ERROR - no such directory : {}".format(self.top_level_archive_dir))
                             self.top_level_archive_dir = None
                 else :
-                    #-------------------------#
-                    # Choose source directory #
-                    #-------------------------#
+                    #---------------------------#
+                    # Choosing source directory #
+                    #---------------------------#
                     self.top_level_source_dir = directory
                     self.log("Selected top level source directory {}".format(self.top_level_source_dir))
                     if not os.path.exists(self.top_level_source_dir) or not os.path.isdir(self.top_level_source_dir) :
                         self.log("ERROR - no such directory : {}".format(self.top_level_source_dir))
                         self.top_level_source_dir = None
-                    if self.top_level_source_dir :
-                        if self.top_level_archive_dir :
-                            if Files.isSameFile(Paths.get(self.top_level_source_dir), Paths.get(self.top_level_archive_dir)) :
-                                self.log("ERROR - top level source and archive directories may not be the same")
-                                self.top_level_source_dir = None
-                        if self.top_level_source_dir :
-                            self.dss_files = []
-                            self.root = DefaultMutableTreeNode(os.sep)
-                            self.nodes = {os.sep : self.root}
-                            self.paths = {self.root : os.sep}
-                            self.rows = {}
-                            self.file_versions = {}
-                            self.file_sizes = {}
-                            self.files_to_convert = 0
-                            self.bytes_to_convert = 0
-                            self.tree.setModel(DefaultTreeModel(self.root))
-                            self.tree_cell_renderer.resetRowVersions()
-                            self.tfTopLevelSrcDir.setText(self.top_level_source_dir)
-                            self.addDssFiles(find_dss_files(self.top_level_source_dir))
+                #-------------------------------------------#
+                # Verify directories relative to each other #
+                #-------------------------------------------#
+                if self.top_level_source_dir and self.top_level_archive_dir :
+                    if self.top_level_archive_dir.startswith(self.top_level_source_dir) :
+                        self.log("ERROR: top level archive directory cannot be the same as or a subdirectory of the top level source directory")
+                        if choosing_archive :
+                            self.top_level_archive_dir = None
+                        else :
+                            self.top_level_source_dir = None
+                    elif self.top_level_source_dir.startswith(self.top_level_archive_dir) :
+                        self.log("ERROR: top level source directory cannot be the same as or a subdirectory of the top level archive directory")
+                        if choosing_archive :
+                            self.top_level_archive_dir = None
+                        else :
+                            self.top_level_source_dir = None
+                if self.top_level_source_dir and not choosing_archive :
+                    #---------------------------------------------#
+                    # populate the tree from the source directory #
+                    #---------------------------------------------#
+                    self.dss_files = []
+                    self.root = DefaultMutableTreeNode(os.sep)
+                    self.nodes = {os.sep : self.root}
+                    self.paths = {self.root : os.sep}
+                    self.rows = {}
+                    self.file_versions = {}
+                    self.file_sizes = {}
+                    self.files_to_convert = 0
+                    self.bytes_to_convert = 0
+                    self.tree.setModel(DefaultTreeModel(self.root))
+                    self.tree_cell_renderer.resetRowVersions()
+                    self.tfTopLevelSrcDir.setText(self.top_level_source_dir)
+                    self.addDssFiles(find_dss_files(self.top_level_source_dir))
+                elif self.top_level_archive_dir and choosing_archive :
+                    self.tfTopLevelArchDir.setText(self.top_level_archive_dir)
+
         except JavaException as je :
             self.log("ERROR - {}".format(je.getMessage()))
             je.printStackTrace()
@@ -616,7 +637,7 @@ class DssConverterFrame(JFrame, ActionListener):
             
     def isCanceled(self) :
         '''
-        Return whether conversion was canceled befor completion
+        Return whether conversion was canceled before completion
         '''
         return self.conversion_canceled
         
@@ -690,11 +711,16 @@ class DssConverterFrame(JFrame, ActionListener):
         self.lblEtaValue.setText("")
         elapsed = secsToHms((datetime.datetime.now() - start_time).total_seconds())
         if self.isCanceled() :
+            self.lblEtaValue.setText("Canceled")
             self.log("Convesrion canceled after {}".format(elapsed))
+            self.setTitle("{0} v{1} - Canceled".format(self._title, self._version))
             if self.exit_when_canceled :
                 self.exitOrCancel(None)
         else :
+            self.lblEtaValue.setText("Done")
             self.log("Convesrion completed: {0} in {1}".format(formatByteCount(self.total_bytes_to_convert), elapsed))
+            self.setTitle("{0} v{1} - 100%".format(self._title, self._version))
+        self.addDssFiles(find_dss_files(self.top_level_source_dir))
         self.btnStart.setEnabled(True)
 
     def updateEta(self, e):
@@ -732,7 +758,7 @@ class DssConverterFrame(JFrame, ActionListener):
             self.lblFilesCount.setText("{0} / {1}".format(files_converted, self.files_to_convert))
             self.pbBytes.setValue(int(percent_complete))
             self.lblBytesCount.setText("{0} / {1}".format(formatByteCount(bytes_converted), formatByteCount(self.bytes_to_convert)))
-            self.setTitle("{0} - {1}%".format(self._title, int(percent_complete)))
+            self.setTitle("{0} v{1} - {2}%".format(self._title, self._version, int(percent_complete)))
             if percent_complete >= 2.0 :
                 estimated_total_secs = elapsed / (fraction ** 2.0) # try to prevent optimistic early estimates
                 estimated_remaining_secs = estimated_total_secs - elapsed
