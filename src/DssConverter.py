@@ -23,6 +23,7 @@ from java.awt                import Dimension
 from java.awt                import Frame
 from java.awt                import Toolkit
 from java.awt.event          import ActionListener
+from java.awt.event          import ComponentAdapter
 from java.awt.event          import WindowAdapter
 from java.io                 import File
 from java.lang               import Exception as JavaException
@@ -30,6 +31,7 @@ from java.lang               import System
 from java.nio.file           import Files
 from java.nio.file           import Paths
 from java.nio.file           import StandardCopyOption
+from javax.swing             import ImageIcon
 from javax.swing             import JButton
 from javax.swing             import JFileChooser
 from javax.swing             import JFrame
@@ -79,6 +81,16 @@ class DssConverterFrame(JFrame, ActionListener):
 
         def windowClosing(self, e) :
             self.dialog.onClose(e)
+
+    class MyComponentAdapter(ComponentAdapter) :
+        '''
+        A ComponentListener subclass to handle window resizing events
+        '''
+        def __init__(self, dialog) :
+            self.dialog = dialog
+
+        def componentResized(self, e) :
+            self.dialog.arrangeComponents()
 
     def __init__(self, title=None, gc=None):
         '''
@@ -148,13 +160,12 @@ class DssConverterFrame(JFrame, ActionListener):
         self.dss_message_file = self.log_file_name.replace(".log", ".dssmsg.log")
         self.initComponents()
         self.addWindowListener(self.MyWindowAdapter(self))
+        self.addComponentListener(self.MyComponentAdapter(self))
 
     def initComponents(self):
         '''
         Set up the UI
         '''
-        self.setPreferredSize(Dimension(self._width, self._height))
-        self.setResizable(False)
         if center_on_x :
             # center on ListSelection window
             self.setLocation(max(0, center_on_x - self._width / 2), max(0, center_on_y - self._height / 2))
@@ -164,167 +175,199 @@ class DssConverterFrame(JFrame, ActionListener):
             self.setLocation(max(0, (screen_size.width - self._width) / 2), max(0, (screen_size.height - self._height) / 2))
         self.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE)
         self.setTitle("{0} v{1}".format(self._title, self._version))
+
         springLayout = SpringLayout()
-        self.getContentPane().setLayout(springLayout)
-        
-        lblTopLevelSrcDir = JLabel("Top Level Source Directory")
-        springLayout.putConstraint(SpringLayout.NORTH, lblTopLevelSrcDir, 10, SpringLayout.NORTH, self.getContentPane())
-        springLayout.putConstraint(SpringLayout.WEST, lblTopLevelSrcDir, 10, SpringLayout.WEST, self.getContentPane())
-        self.getContentPane().add(lblTopLevelSrcDir)
+        contentPane = self.getContentPane()
+        contentPane.setLayout(springLayout)
+
+        self.lblTopLevelSrcDir = JLabel("Top Level Source Directory")
+        contentPane.add(self.lblTopLevelSrcDir)
         
         self.tfTopLevelSrcDir = JTextField()
         self.tfTopLevelSrcDir.setEditable(False)
         self.tfTopLevelSrcDir.setColumns(10)
-        springLayout.putConstraint(SpringLayout.NORTH, self.tfTopLevelSrcDir, -4, SpringLayout.NORTH, lblTopLevelSrcDir)
-        springLayout.putConstraint(SpringLayout.WEST, self.tfTopLevelSrcDir, 6, SpringLayout.EAST, lblTopLevelSrcDir)
-        springLayout.putConstraint(SpringLayout.EAST, self.tfTopLevelSrcDir, -140, SpringLayout.EAST, self.getContentPane())
         
-        self.getContentPane().add(self.tfTopLevelSrcDir)
+        contentPane.add(self.tfTopLevelSrcDir)
         
         self.btnTopLevelSrcDir = JButton("Choose")
         self.btnTopLevelSrcDir.addActionListener(self.chooseTopLevelDirs)
-        springLayout.putConstraint(SpringLayout.NORTH, self.btnTopLevelSrcDir, 0, SpringLayout.NORTH, self.tfTopLevelSrcDir)
-        springLayout.putConstraint(SpringLayout.EAST, self.btnTopLevelSrcDir, -20, SpringLayout.EAST, self.getContentPane())
-        springLayout.putConstraint(SpringLayout.WEST, self.btnTopLevelSrcDir, -100, SpringLayout.EAST, self.btnTopLevelSrcDir)
-        self.getContentPane().add(self.btnTopLevelSrcDir)
+        contentPane.add(self.btnTopLevelSrcDir)
         
-        lblTopLevelArchDir = JLabel("Top Level Archive Directory")
-        springLayout.putConstraint(SpringLayout.NORTH, lblTopLevelArchDir, 10, SpringLayout.SOUTH, lblTopLevelSrcDir)
-        springLayout.putConstraint(SpringLayout.WEST, lblTopLevelArchDir, 0, SpringLayout.WEST, lblTopLevelSrcDir)
-        self.getContentPane().add(lblTopLevelArchDir)
+        self.lblTopLevelArchDir = JLabel("Top Level Archive Directory")
+        contentPane.add(self.lblTopLevelArchDir)
         
         self.tfTopLevelArchDir = JTextField()
         self.tfTopLevelArchDir.setEditable(False)
         self.tfTopLevelArchDir.setColumns(10)
-        springLayout.putConstraint(SpringLayout.NORTH, self.tfTopLevelArchDir, -4, SpringLayout.NORTH, lblTopLevelArchDir)
-        springLayout.putConstraint(SpringLayout.WEST, self.tfTopLevelArchDir, 0, SpringLayout.WEST, self.tfTopLevelSrcDir)
-        springLayout.putConstraint(SpringLayout.EAST, self.tfTopLevelArchDir, 0, SpringLayout.EAST, self.tfTopLevelSrcDir)
-        self.getContentPane().add(self.tfTopLevelArchDir)
-        
-        springLayout.putConstraint(SpringLayout.WEST, self.tfTopLevelSrcDir, 6, SpringLayout.EAST, lblTopLevelArchDir)
+        contentPane.add(self.tfTopLevelArchDir)      
         
         self.btnTopLevelArchDir = JButton("Choose")
         self.btnTopLevelArchDir.addActionListener(self.chooseTopLevelDirs)
-        springLayout.putConstraint(SpringLayout.NORTH, self.btnTopLevelArchDir, 0, SpringLayout.NORTH, self.tfTopLevelArchDir)
-        springLayout.putConstraint(SpringLayout.WEST, self.btnTopLevelArchDir, 0, SpringLayout.WEST, self.btnTopLevelSrcDir)
-        springLayout.putConstraint(SpringLayout.EAST, self.btnTopLevelArchDir, 0, SpringLayout.EAST, self.btnTopLevelSrcDir)
-        self.getContentPane().add(self.btnTopLevelArchDir)
+        contentPane.add(self.btnTopLevelArchDir)
 
-        lblV6DssFile = JLabel("Version 6 DSS file")
-        lblV6DssFile.setForeground(Color.RED)
-        springLayout.putConstraint(SpringLayout.NORTH, lblV6DssFile, 10, SpringLayout.SOUTH, lblTopLevelArchDir)
-        springLayout.putConstraint(SpringLayout.WEST, lblV6DssFile, 0, SpringLayout.WEST, lblTopLevelArchDir)
-        self.getContentPane().add(lblV6DssFile)
+        self.lblV6DssFile = JLabel("Version 6 DSS file")
+        self.lblV6DssFile.setForeground(Color.RED)
+        contentPane.add(self.lblV6DssFile)
 
-        lblV7DssFile = JLabel("Version 7 DSS file")
-        lblV7DssFile.setForeground(Color.BLUE)
-        springLayout.putConstraint(SpringLayout.NORTH, lblV7DssFile, 2, SpringLayout.SOUTH, lblV6DssFile)
-        springLayout.putConstraint(SpringLayout.WEST, lblV7DssFile, 0, SpringLayout.WEST, lblV6DssFile)
-        self.getContentPane().add(lblV7DssFile)
+        self.lblV7DssFile = JLabel("Version 7 DSS file")
+        self.lblV7DssFile.setForeground(Color.BLUE)
+        contentPane.add(self.lblV7DssFile)
         
         self.tree = JTree(self.root)
         self.tree.addTreeWillExpandListener(CustomTreeWillExpandListener())
         self.tree_cell_renderer = CustomTreeCellRenderer()
         self.tree.setCellRenderer(self.tree_cell_renderer)
         self.treeScrollPane = JScrollPane(self.tree)
-        springLayout.putConstraint(SpringLayout.NORTH, self.treeScrollPane, 2, SpringLayout.SOUTH, lblV7DssFile)
-        springLayout.putConstraint(SpringLayout.SOUTH, self.treeScrollPane, 506, SpringLayout.NORTH, self.getContentPane())
-        springLayout.putConstraint(SpringLayout.WEST, self.treeScrollPane, 10, SpringLayout.WEST, self.getContentPane())
-        springLayout.putConstraint(SpringLayout.EAST, self.treeScrollPane, 0, SpringLayout.EAST, self.tfTopLevelSrcDir)
-        self.getContentPane().add(self.treeScrollPane)
+        contentPane.add(self.treeScrollPane)
         
-        lblLogFileName = JLabel("Log file: {}".format(self.log_file_name))
-        springLayout.putConstraint(SpringLayout.NORTH, lblLogFileName, 10, SpringLayout.SOUTH, self.treeScrollPane)
-        springLayout.putConstraint(SpringLayout.WEST, lblLogFileName, 0, SpringLayout.WEST, self.treeScrollPane)
-        self.getContentPane().add(lblLogFileName)
+        self.lblLogFileName = JLabel("Log file: {}".format(self.log_file_name))
+        contentPane.add(self.lblLogFileName)
         
         self.taLog = JTextArea()
         self.taLog.setEditable(False)
         self.logScrollPane = JScrollPane(self.taLog)
-        springLayout.putConstraint(SpringLayout.NORTH, self.logScrollPane, 10, SpringLayout.SOUTH, lblLogFileName)
-        springLayout.putConstraint(SpringLayout.WEST, self.logScrollPane, 0, SpringLayout.WEST, self.treeScrollPane)
-        springLayout.putConstraint(SpringLayout.SOUTH, self.logScrollPane, 200, SpringLayout.SOUTH, self.treeScrollPane)
-        springLayout.putConstraint(SpringLayout.EAST, self.logScrollPane, 802, SpringLayout.WEST, self.getContentPane())
-        self.getContentPane().add(self.logScrollPane)
+        contentPane.add(self.logScrollPane)
         
-        lblFiles = JLabel("Files")
-        springLayout.putConstraint(SpringLayout.NORTH, lblFiles, 10, SpringLayout.SOUTH, self.logScrollPane)
-        springLayout.putConstraint(SpringLayout.WEST, lblFiles, 0, SpringLayout.WEST, self.logScrollPane)
-        self.getContentPane().add(lblFiles)
+        self.lblFiles = JLabel("Files")
+        contentPane.add(self.lblFiles)
         
         self.pbFiles = JProgressBar()
-        springLayout.putConstraint(SpringLayout.NORTH, self.pbFiles, 0, SpringLayout.NORTH, lblFiles)
-        springLayout.putConstraint(SpringLayout.WEST, self.pbFiles, 12, SpringLayout.EAST, lblFiles)
-        springLayout.putConstraint(SpringLayout.SOUTH, self.pbFiles, 0, SpringLayout.SOUTH, lblFiles)
-        springLayout.putConstraint(SpringLayout.EAST, self.pbFiles, 224, SpringLayout.EAST, lblFiles)
-        self.getContentPane().add(self.pbFiles)
+        contentPane.add(self.pbFiles)
         
-        lblBytes = JLabel("Bytes")
-        springLayout.putConstraint(SpringLayout.NORTH, lblBytes, 10, SpringLayout.SOUTH, lblFiles)
-        springLayout.putConstraint(SpringLayout.WEST, lblBytes, 10, SpringLayout.WEST, self.getContentPane())
-        self.getContentPane().add(lblBytes)
+        self.lblBytes = JLabel("Bytes")
+        contentPane.add(self.lblBytes)
         
         self.pbBytes = JProgressBar()
-        springLayout.putConstraint(SpringLayout.NORTH, self.pbBytes, 0, SpringLayout.NORTH, lblBytes)
-        springLayout.putConstraint(SpringLayout.WEST, self.pbBytes, 6, SpringLayout.EAST, lblBytes)
-        springLayout.putConstraint(SpringLayout.SOUTH, self.pbBytes, 0, SpringLayout.SOUTH, lblBytes)
-        springLayout.putConstraint(SpringLayout.EAST, self.pbBytes, 0, SpringLayout.EAST, self.pbFiles)
-        self.getContentPane().add(self.pbBytes)
+        contentPane.add(self.pbBytes)
         
         self.lblFilesCount = JLabel("000000 / 000000")
-        springLayout.putConstraint(SpringLayout.NORTH, self.lblFilesCount, 0, SpringLayout.NORTH, lblFiles)
-        springLayout.putConstraint(SpringLayout.WEST, self.lblFilesCount, 6, SpringLayout.EAST, self.pbFiles)
-        springLayout.putConstraint(SpringLayout.EAST, self.lblFilesCount, 110, SpringLayout.EAST, self.pbFiles)
         preferredSize = self.lblFilesCount.getPreferredSize()
         self.lblFilesCount.setPreferredSize(Dimension(preferredSize.width+20, preferredSize.height))
-        self.getContentPane().add(self.lblFilesCount)
+        contentPane.add(self.lblFilesCount)
         self.lblFilesCount.setText("")
         
         self.lblBytesCount = JLabel("000.00 MB / 000.00 MB")
-        springLayout.putConstraint(SpringLayout.NORTH, self.lblBytesCount, 0, SpringLayout.NORTH, lblBytes)
-        springLayout.putConstraint(SpringLayout.WEST, self.lblBytesCount, 6, SpringLayout.EAST, self.pbBytes)
-        springLayout.putConstraint(SpringLayout.SOUTH, self.lblBytesCount, 0, SpringLayout.SOUTH, lblBytes)
-        springLayout.putConstraint(SpringLayout.EAST, self.lblBytesCount, 0, SpringLayout.EAST, self.lblFilesCount)
         preferredSize = self.lblBytesCount.getPreferredSize()
         self.lblBytesCount.setPreferredSize(Dimension(preferredSize.width+20, preferredSize.height))
-        self.getContentPane().add(self.lblBytesCount)
+        contentPane.add(self.lblBytesCount)
         self.lblBytesCount.setText("")
         
-        lblEta = JLabel("ETA")
-        springLayout.putConstraint(SpringLayout.NORTH, lblEta, 10, SpringLayout.SOUTH, lblBytes)
-        springLayout.putConstraint(SpringLayout.WEST, lblEta, 10, SpringLayout.WEST, self.getContentPane())
-        self.getContentPane().add(lblEta)
+        self.lblEta = JLabel("ETA")
+        contentPane.add(self.lblEta)
         
         self.lblEtaValue = JLabel("0 hrs 00 min 00 sec")
-        springLayout.putConstraint(SpringLayout.NORTH, self.lblEtaValue, 0, SpringLayout.NORTH, lblEta)
-        springLayout.putConstraint(SpringLayout.WEST, self.lblEtaValue, 0, SpringLayout.WEST, self.pbFiles)
-        springLayout.putConstraint(SpringLayout.SOUTH, self.lblEtaValue, 0, SpringLayout.SOUTH, lblEta)
-        springLayout.putConstraint(SpringLayout.EAST, self.lblEtaValue, 120, SpringLayout.WEST, self.pbFiles)
-        self.getContentPane().add(self.lblEtaValue)
+        contentPane.add(self.lblEtaValue)
         self.lblEtaValue.setText("")
         
         self.btnStart = JButton("Start")
         self.btnStart.addActionListener(self.startFileConversion)
-        springLayout.putConstraint(SpringLayout.NORTH, self.btnStart, 0, SpringLayout.NORTH, self.treeScrollPane)
-        springLayout.putConstraint(SpringLayout.WEST, self.btnStart, 0, SpringLayout.WEST, self.btnTopLevelSrcDir)
-        springLayout.putConstraint(SpringLayout.EAST, self.btnStart, 0, SpringLayout.EAST, self.btnTopLevelSrcDir)
         self.btnStart.setEnabled(False)
-        self.getContentPane().add(self.btnStart)
+        contentPane.add(self.btnStart)
         
         self.btnExitCancel = JButton("Exit")
         self.btnExitCancel.addActionListener(self.exitOrCancel)
+        contentPane.add(self.btnExitCancel)
+        
+        self.treeScrollPane.updateUI()
+        self.setPreferredSize(Dimension(self._width, self._height))
+
+    def arrangeComponents(self) :
+        '''
+        Arrange components after resize
+        '''
+        contentPane = self.getContentPane()
+        springLayout = contentPane.getLayout()
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblTopLevelSrcDir, 10, SpringLayout.NORTH, contentPane)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblTopLevelSrcDir, 10, SpringLayout.WEST, contentPane)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.tfTopLevelSrcDir, -4, SpringLayout.NORTH, self.lblTopLevelSrcDir)
+        springLayout.putConstraint(SpringLayout.WEST, self.tfTopLevelSrcDir, 6, SpringLayout.EAST, self.lblTopLevelSrcDir)
+        springLayout.putConstraint(SpringLayout.EAST, self.tfTopLevelSrcDir, -140, SpringLayout.EAST, contentPane)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.btnTopLevelSrcDir, 0, SpringLayout.NORTH, self.tfTopLevelSrcDir)
+        springLayout.putConstraint(SpringLayout.EAST, self.btnTopLevelSrcDir, -20, SpringLayout.EAST, contentPane)
+        springLayout.putConstraint(SpringLayout.WEST, self.btnTopLevelSrcDir, -100, SpringLayout.EAST, self.btnTopLevelSrcDir)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblTopLevelArchDir, 10, SpringLayout.SOUTH, self.lblTopLevelSrcDir)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblTopLevelArchDir, 0, SpringLayout.WEST, self.lblTopLevelSrcDir)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.tfTopLevelArchDir, -4, SpringLayout.NORTH, self.lblTopLevelArchDir)
+        springLayout.putConstraint(SpringLayout.WEST, self.tfTopLevelArchDir, 0, SpringLayout.WEST, self.tfTopLevelSrcDir)
+        springLayout.putConstraint(SpringLayout.EAST, self.tfTopLevelArchDir, 0, SpringLayout.EAST, self.tfTopLevelSrcDir)
+
+        springLayout.putConstraint(SpringLayout.WEST, self.tfTopLevelSrcDir, 6, SpringLayout.EAST, self.lblTopLevelArchDir)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.btnTopLevelArchDir, 0, SpringLayout.NORTH, self.tfTopLevelArchDir)
+        springLayout.putConstraint(SpringLayout.WEST, self.btnTopLevelArchDir, 0, SpringLayout.WEST, self.btnTopLevelSrcDir)
+        springLayout.putConstraint(SpringLayout.EAST, self.btnTopLevelArchDir, 0, SpringLayout.EAST, self.btnTopLevelSrcDir)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblV6DssFile, 10, SpringLayout.SOUTH, self.lblTopLevelArchDir)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblV6DssFile, 0, SpringLayout.WEST, self.lblTopLevelArchDir)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblV7DssFile, 2, SpringLayout.SOUTH, self.lblV6DssFile)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblV7DssFile, 0, SpringLayout.WEST, self.lblV6DssFile)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.treeScrollPane, 2, SpringLayout.SOUTH, self.lblV7DssFile)
+        springLayout.putConstraint(SpringLayout.SOUTH, self.treeScrollPane, 506, SpringLayout.NORTH, contentPane)
+        springLayout.putConstraint(SpringLayout.WEST, self.treeScrollPane, 10, SpringLayout.WEST, contentPane)
+        springLayout.putConstraint(SpringLayout.EAST, self.treeScrollPane, 0, SpringLayout.EAST, self.tfTopLevelSrcDir)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblLogFileName, 10, SpringLayout.SOUTH, self.treeScrollPane)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblLogFileName, 0, SpringLayout.WEST, self.treeScrollPane)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.logScrollPane, 10, SpringLayout.SOUTH, self.lblLogFileName)
+        springLayout.putConstraint(SpringLayout.WEST, self.logScrollPane, 0, SpringLayout.WEST, self.treeScrollPane)
+        springLayout.putConstraint(SpringLayout.SOUTH, self.logScrollPane, -10, SpringLayout.NORTH, self.lblFiles)
+        springLayout.putConstraint(SpringLayout.EAST, self.logScrollPane, -10, SpringLayout.EAST, contentPane)
+
+        springLayout.putConstraint(SpringLayout.SOUTH, self.lblFiles, -10, SpringLayout.NORTH, self.lblBytes)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblFiles, 0, SpringLayout.WEST, self.logScrollPane)
+
+        springLayout.putConstraint(SpringLayout.SOUTH, self.lblBytes, -10, SpringLayout.NORTH, self.lblEta)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblBytes, 10, SpringLayout.WEST, contentPane)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.pbFiles, 0, SpringLayout.NORTH, self.lblFiles)
+        springLayout.putConstraint(SpringLayout.WEST, self.pbFiles, 12, SpringLayout.EAST, self.lblFiles)
+        springLayout.putConstraint(SpringLayout.SOUTH, self.pbFiles, 0, SpringLayout.SOUTH, self.lblFiles)
+        springLayout.putConstraint(SpringLayout.EAST, self.pbFiles, 224, SpringLayout.EAST, self.lblFiles)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.pbBytes, 0, SpringLayout.NORTH, self.lblBytes)
+        springLayout.putConstraint(SpringLayout.WEST, self.pbBytes, 6, SpringLayout.EAST, self.lblBytes)
+        springLayout.putConstraint(SpringLayout.SOUTH, self.pbBytes, 0, SpringLayout.SOUTH, self.lblBytes)
+        springLayout.putConstraint(SpringLayout.EAST, self.pbBytes, 0, SpringLayout.EAST, self.pbFiles)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblFilesCount, 0, SpringLayout.NORTH, self.lblFiles)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblFilesCount, 6, SpringLayout.EAST, self.pbFiles)
+        springLayout.putConstraint(SpringLayout.EAST, self.lblFilesCount, 110, SpringLayout.EAST, self.pbFiles)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblBytesCount, 0, SpringLayout.NORTH, self.lblBytes)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblBytesCount, 6, SpringLayout.EAST, self.pbBytes)
+        springLayout.putConstraint(SpringLayout.SOUTH, self.lblBytesCount, 0, SpringLayout.SOUTH, self.lblBytes)
+        springLayout.putConstraint(SpringLayout.EAST, self.lblBytesCount, 0, SpringLayout.EAST, self.lblFilesCount)
+
+        springLayout.putConstraint(SpringLayout.SOUTH, self.lblEta, -20, SpringLayout.SOUTH, contentPane)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblEta, 10, SpringLayout.WEST, contentPane)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblEtaValue, 0, SpringLayout.NORTH, self.lblEta)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblEtaValue, 0, SpringLayout.WEST, self.pbFiles)
+        springLayout.putConstraint(SpringLayout.SOUTH, self.lblEtaValue, 0, SpringLayout.SOUTH, self.lblEta)
+        springLayout.putConstraint(SpringLayout.EAST, self.lblEtaValue, 120, SpringLayout.WEST, self.pbFiles)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.btnStart, 0, SpringLayout.NORTH, self.treeScrollPane)
+        springLayout.putConstraint(SpringLayout.WEST, self.btnStart, 0, SpringLayout.WEST, self.btnTopLevelSrcDir)
+        springLayout.putConstraint(SpringLayout.EAST, self.btnStart, 0, SpringLayout.EAST, self.btnTopLevelSrcDir)
+
         springLayout.putConstraint(SpringLayout.NORTH, self.btnExitCancel, 6, SpringLayout.SOUTH, self.btnStart)
         springLayout.putConstraint(SpringLayout.WEST, self.btnExitCancel, 0, SpringLayout.WEST, self.btnTopLevelSrcDir)
         springLayout.putConstraint(SpringLayout.EAST, self.btnExitCancel, 0, SpringLayout.EAST, self.btnTopLevelSrcDir)
-        self.getContentPane().add(self.btnExitCancel)
-        
-        self.treeScrollPane.updateUI()
 
     def setApplicationFrame(self, frame) :
         '''
         Set the application program frame
         '''
         self.application_frame = frame
+        self.setIconImage(frame.getIconImage())
 
     def setLogsMenu(self, logs_menu) :
         '''
@@ -406,20 +449,21 @@ class DssConverterFrame(JFrame, ActionListener):
                     log_file.write(line)
             self.taLog.setCaretPosition(self.taLog.getDocument().getLength())
 
-    def addDssFiles(self, dss_files) :
+    def setDssFiles(self, dss_files) :
         '''
         Add all DSS files to the tree element, noting the DSS version of each
         '''
         self.dss_files = dss_files[:]
+        self.file_sizes = {}
+        self.file_versions = {}
+        self.files_to_convert = 0
         Heclib.zset("MLVL", "", 0)
         ifltab = array.array('i', 800*[0])
         status = [0]
         for dss_file in dss_files :
-            self.log("Adding DSS file {}".format(dss_file))
             Heclib.zopen(ifltab, dss_file, status)
             dss_version = ifltab[0]
             Heclib.zclose(ifltab)
-            self.log("...DSS v{}".format(dss_version))
             self.file_versions[dss_file] = dss_version
             if dss_version == 6 :
                 self.files_to_convert += 1
@@ -589,7 +633,7 @@ class DssConverterFrame(JFrame, ActionListener):
                     self.tree.setModel(DefaultTreeModel(self.root))
                     self.tree_cell_renderer.resetRowVersions()
                     self.tfTopLevelSrcDir.setText(self.top_level_source_dir)
-                    self.addDssFiles(find_dss_files(self.top_level_source_dir))
+                    self.setDssFiles(find_dss_files(self.top_level_source_dir))
                 elif self.top_level_archive_dir and choosing_archive :
                     self.tfTopLevelArchDir.setText(self.top_level_archive_dir)
 
@@ -720,7 +764,7 @@ class DssConverterFrame(JFrame, ActionListener):
             self.lblEtaValue.setText("Done")
             self.log("Convesrion completed: {0} in {1}".format(formatByteCount(self.total_bytes_to_convert), elapsed))
             self.setTitle("{0} v{1} - 100%".format(self._title, self._version))
-        self.addDssFiles(find_dss_files(self.top_level_source_dir))
+        self.setDssFiles(find_dss_files(self.top_level_source_dir))
         self.btnStart.setEnabled(True)
 
     def updateEta(self, e):
@@ -1079,10 +1123,10 @@ def main() :
                                 logs_menu = component
 
     window = DssConverterFrame()
-    window.pack()
-    window.setVisible(True)
     window.setApplicationFrame(application_frame)
     window.setLogsMenu(logs_menu)
+    window.pack()
+    window.setVisible(True)
 
 if __name__ == "__main__":
     threading.Thread(target=main).start()
