@@ -1,3 +1,7 @@
+# name=DssConverter
+# displayinmenu=false
+# displaytouser=true
+# displayinselector=true
 '''
 A script to convert all HEC-DSS v6 files in a directory tree to HEC-DSS v7.
 
@@ -13,6 +17,7 @@ A script to convert all HEC-DSS v6 files in a directory tree to HEC-DSS v7.
 Mike Perryman
 USACE Hydrologic Engineering Center
 '''
+from hec.heclib.dss          import HecDss
 from hec.heclib.dss          import HecDSSUtilities
 from hec.heclib.util         import Heclib
 from hec.io                  import Identifier
@@ -20,18 +25,19 @@ from hec.io                  import SimpleFile
 from java.awt                import Color
 from java.awt                import Cursor
 from java.awt                import Dimension
+from java.awt                import Font
 from java.awt                import Frame
 from java.awt                import Toolkit
 from java.awt.event          import ActionListener
 from java.awt.event          import ComponentAdapter
 from java.awt.event          import WindowAdapter
+from java.awt.font           import TextAttribute
 from java.io                 import File
 from java.lang               import Exception as JavaException
 from java.lang               import System
 from java.nio.file           import Files
 from java.nio.file           import Paths
 from java.nio.file           import StandardCopyOption
-from javax.swing             import ImageIcon
 from javax.swing             import JButton
 from javax.swing             import JFileChooser
 from javax.swing             import JFrame
@@ -44,6 +50,7 @@ from javax.swing             import JTextArea
 from javax.swing             import JTextField
 from javax.swing             import JTree
 from javax.swing             import SpringLayout
+from javax.swing             import SwingUtilities
 from javax.swing             import SwingWorker
 from javax.swing             import Timer
 from javax.swing             import UIManager
@@ -54,7 +61,7 @@ from javax.swing.tree        import DefaultMutableTreeNode
 from javax.swing.tree        import DefaultTreeCellRenderer
 from javax.swing.tree        import DefaultTreeModel
 from javax.swing.tree        import ExpandVetoException
-import array, copy, datetime, os, re, threading, time, traceback
+import copy, datetime, os, re, sys, threading, time, traceback
 
 try :
     from com.rma.editors import TextEditorDialog
@@ -98,7 +105,7 @@ class DssConverterFrame(JFrame, ActionListener):
         '''
         super(DssConverterFrame, self).__init__(title, gc)
         self._title = "DSS v6 to v7 Converter"
-        self._version = "1.4"
+        self._version = "1.5"
         self._width = 830
         self._height = 830
         self.logLock = threading.RLock()
@@ -212,6 +219,13 @@ class DssConverterFrame(JFrame, ActionListener):
         self.lblV7DssFile = JLabel("Version 7 DSS file")
         self.lblV7DssFile.setForeground(Color.BLUE)
         contentPane.add(self.lblV7DssFile)
+
+        self.lblCorruptDssFile = JLabel("Corrupt DSS file")
+        self.lblCorruptDssFile.setForeground(Color.ORANGE.darker())
+        attrs = self.lblCorruptDssFile.getFont().getAttributes()
+        attrs.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON)
+        self.lblCorruptDssFile.setFont(Font(attrs))
+        contentPane.add(self.lblCorruptDssFile)
         
         self.tree = JTree(self.root)
         self.tree.addTreeWillExpandListener(CustomTreeWillExpandListener())
@@ -308,7 +322,10 @@ class DssConverterFrame(JFrame, ActionListener):
         springLayout.putConstraint(SpringLayout.NORTH, self.lblV7DssFile, 2, SpringLayout.SOUTH, self.lblV6DssFile)
         springLayout.putConstraint(SpringLayout.WEST, self.lblV7DssFile, 0, SpringLayout.WEST, self.lblV6DssFile)
 
-        springLayout.putConstraint(SpringLayout.NORTH, self.treeScrollPane, 2, SpringLayout.SOUTH, self.lblV7DssFile)
+        springLayout.putConstraint(SpringLayout.NORTH, self.lblCorruptDssFile, 2, SpringLayout.SOUTH, self.lblV7DssFile)
+        springLayout.putConstraint(SpringLayout.WEST, self.lblCorruptDssFile, 0, SpringLayout.WEST, self.lblV7DssFile)
+
+        springLayout.putConstraint(SpringLayout.NORTH, self.treeScrollPane, 2, SpringLayout.SOUTH, self.lblCorruptDssFile)
         springLayout.putConstraint(SpringLayout.SOUTH, self.treeScrollPane, 506, SpringLayout.NORTH, contentPane)
         springLayout.putConstraint(SpringLayout.WEST, self.treeScrollPane, 10, SpringLayout.WEST, contentPane)
         springLayout.putConstraint(SpringLayout.EAST, self.treeScrollPane, 0, SpringLayout.EAST, self.tfTopLevelSrcDir)
@@ -449,25 +466,36 @@ class DssConverterFrame(JFrame, ActionListener):
                     log_file.write(line)
             self.taLog.setCaretPosition(self.taLog.getDocument().getLength())
 
-    def setDssFiles(self, dss_files) :
+    def setDssFiles(self, dss_files, update_ui=True) :
         '''
         Add all DSS files to the tree element, noting the DSS version of each
         '''
-        self.dss_files = dss_files[:]
-        self.file_sizes = {}
+        #-------------------#
+        # populate the tree #
+        #-------------------#
+        self.root = DefaultMutableTreeNode(os.sep)
+        self.nodes = {os.sep : self.root}
+        self.paths = {self.root : os.sep}
+        self.rows = {}
         self.file_versions = {}
+        self.file_sizes = {}
         self.files_to_convert = 0
-        Heclib.zset("MLVL", "", 0)
-        ifltab = array.array('i', 800*[0])
-        status = [0]
+        self.bytes_to_convert = 0
+        self.tree.setModel(DefaultTreeModel(self.root))
+        self.tree_cell_renderer.resetRowVersions()
+        self.dss_files = dss_files[:]
         for dss_file in dss_files :
-            Heclib.zopen(ifltab, dss_file, status)
-            dss_version = ifltab[0]
-            Heclib.zclose(ifltab)
+            dss = HecDss.open(dss_file)
+            dss_version = dss.getDataManager().getDssFileVersion()
+            dss.close()
             self.file_versions[dss_file] = dss_version
             if dss_version == 6 :
                 self.files_to_convert += 1
-            self.log("Added v{0} DSS file {1}".format(dss_version, dss_file))
+            if update_ui :
+                if dss_version == -1 :
+                    self.log("Added corrupt DSS file {}".format(dss_file))
+                else :
+                    self.log("Added v{0} DSS file {1}".format(dss_version, dss_file))
             node = self.root
             parts = dss_file.split(os.sep)
             for i in range(len(parts)+1) :
@@ -480,7 +508,6 @@ class DssConverterFrame(JFrame, ActionListener):
                     node = new_node
                 else :
                     node = self.nodes[path]
-        Heclib.zset("MLVL", "", 1)
         self.tree.updateUI()
         self.expandAllTreeRows()
         for row in range(self.tree.getRowCount()) :
@@ -498,17 +525,18 @@ class DssConverterFrame(JFrame, ActionListener):
                     self.bytes_to_convert += size
         self.total_bytes_to_convert = self.bytes_to_convert
         self.tree.updateUI()
-        self.log("{0} files added from {1}".format(len(dss_files), self.top_level_source_dir))
-        self.log("{0} in {1} v6 HEC-DSS files to convert".format(formatByteCount(self.bytes_to_convert), self.files_to_convert))
-        self.lblFilesCount.setText("0 / {}".format(self.files_to_convert))
-        self.lblBytesCount.setText("0 B / {}".format(formatByteCount(self.bytes_to_convert)))
-        self.pbFiles.setMinimum(0)
-        self.pbFiles.setMaximum(self.files_to_convert)
-        self.pbFiles.setValue(0)
-        self.pbBytes.setMinimum(0)
-        self.pbBytes.setMaximum(100)
-        self.pbBytes.setValue(0)
-        self.btnStart.setEnabled(self.bytes_to_convert > 0)
+        if update_ui :
+            self.log("{0} files added from {1}".format(len(dss_files), self.top_level_source_dir))
+            self.log("{0} in {1} v6 HEC-DSS files to convert".format(formatByteCount(self.bytes_to_convert), self.files_to_convert))
+            self.lblFilesCount.setText("0 / {}".format(self.files_to_convert))
+            self.lblBytesCount.setText("0 B / {}".format(formatByteCount(self.bytes_to_convert)))
+            self.pbFiles.setMinimum(0)
+            self.pbFiles.setMaximum(self.files_to_convert)
+            self.pbFiles.setValue(0)
+            self.pbBytes.setMinimum(0)
+            self.pbBytes.setMaximum(100)
+            self.pbBytes.setValue(0)
+            self.btnStart.setEnabled(self.bytes_to_convert > 0)
 
     def setDssFileVersionInTree(self, dss_file, version, update_view=True) :
         '''
@@ -557,9 +585,13 @@ class DssConverterFrame(JFrame, ActionListener):
             if choosing_archive :
                 if self.top_level_archive_dir :
                     initial_directory = self.top_level_archive_dir
+                elif len(sys.argv) > 2 :
+                    initial_directory = sys.argv[2]
                 elif self.top_level_source_dir :
                     initial_directory = os.path.split(self.top_level_source_dir)[0]
             else :
+                if len(sys.argv) > 1 :
+                    initial_directory = sys.argv[1]
                 if self.top_level_source_dir :
                     initial_directory = self.top_level_source_dir
                 elif self.top_level_archive_dir :
@@ -589,7 +621,7 @@ class DssConverterFrame(JFrame, ActionListener):
                             os.mkdir(self.top_level_archive_dir)
                             self.log("Created directory {}".format(self.top_level_archive_dir))
                         else :
-                            self.log("Selected top level archive directiry does not exist and was not created")
+                            self.log("Selected top level archive directory does not exist and was not created")
                             self.log("ERROR - no such directory : {}".format(self.top_level_archive_dir))
                             self.top_level_archive_dir = None
                 else :
@@ -617,25 +649,47 @@ class DssConverterFrame(JFrame, ActionListener):
                             self.top_level_archive_dir = None
                         else :
                             self.top_level_source_dir = None
+
                 if self.top_level_source_dir and not choosing_archive :
-                    #---------------------------------------------#
-                    # populate the tree from the source directory #
-                    #---------------------------------------------#
-                    self.dss_files = []
-                    self.root = DefaultMutableTreeNode(os.sep)
-                    self.nodes = {os.sep : self.root}
-                    self.paths = {self.root : os.sep}
-                    self.rows = {}
-                    self.file_versions = {}
-                    self.file_sizes = {}
-                    self.files_to_convert = 0
-                    self.bytes_to_convert = 0
-                    self.tree.setModel(DefaultTreeModel(self.root))
-                    self.tree_cell_renderer.resetRowVersions()
                     self.tfTopLevelSrcDir.setText(self.top_level_source_dir)
                     self.setDssFiles(find_dss_files(self.top_level_source_dir))
                 elif self.top_level_archive_dir and choosing_archive :
                     self.tfTopLevelArchDir.setText(self.top_level_archive_dir)
+                #---------------------------------------------------#
+                # Confirm overwriting of files in archive directory #
+                #---------------------------------------------------#
+                if self.top_level_source_dir and self.top_level_archive_dir :
+                    collisions = []
+                    for dss_file in self.dss_files :
+                        if self.file_versions[dss_file] != 7 :
+                            relative_filename = dss_file[len(self.top_level_source_dir):]
+                            if relative_filename[0] == os.sep :
+                                relative_filename = relative_filename[1:]
+                            archive_file = os.path.join(self.top_level_archive_dir, relative_filename)
+                            if os.path.exists(archive_file) :
+                                collisions.append(archive_file)
+                    if collisions:
+                        collision_count = len(collisions)
+                        maxfilecount = 5
+                        maxfilelen = 80
+                        message = "<html>Using directory <b>{0}</b> will overwrite {1} existing file(s)<hr>".format(self.top_level_archive_dir, collision_count)
+                        filecount = collision_count if collision_count <= maxfilecount else maxfilecount - 1
+                        for i in range(filecount) :
+                            message += "{0}{1}".format("" if i == 0 else "<br>", collisions[i] if len(collisions[i]) < maxfilelen else "...{}".format(collisions[i][-(maxfilelen-3):]))
+                        if len(collisions) > filecount :
+                            message += "<br>... {} more".format(len(collisions)-filecount)
+                        message += "</html>"
+                        UIManager.put("OptionPane.defaultButton", "No")
+                        choice = JOptionPane.showConfirmDialog(
+                            self,
+                            message,
+                            "Overwrite Files In Archive Directory?",
+                            JOptionPane.YES_NO_OPTION)
+                        UIManager.put("OptionPane.defaultButton", None)
+                        if choice == JOptionPane.NO_OPTION :
+                            self.log("Top level archive directory abandoned due to file conflicts")
+                            self.top_level_archive_dir = None
+                            self.tfTopLevelArchDir.setText(None)
 
         except JavaException as je :
             self.log("ERROR - {}".format(je.getMessage()))
@@ -649,6 +703,10 @@ class DssConverterFrame(JFrame, ActionListener):
             self.btnTopLevelArchDir.setEnabled(True)
             self.btnStart.setEnabled(bool(self.top_level_source_dir) and bool(self.top_level_archive_dir))
             self.btnExitCancel.setEnabled(True)
+            if choosing_archive and self.top_level_archive_dir :
+                self.btnStart.requestFocusInWindow()
+            else :
+                self.btnTopLevelArchDir.requestFocusInWindow()
 
     def exitOrCancel(self, e):
         '''
@@ -764,7 +822,7 @@ class DssConverterFrame(JFrame, ActionListener):
             self.lblEtaValue.setText("Done")
             self.log("Convesrion completed: {0} in {1}".format(formatByteCount(self.total_bytes_to_convert), elapsed))
             self.setTitle("{0} v{1} - 100%".format(self._title, self._version))
-        self.setDssFiles(find_dss_files(self.top_level_source_dir))
+        self.setDssFiles(find_dss_files(self.top_level_source_dir), update_ui=False)
         self.btnStart.setEnabled(True)
 
     def updateEta(self, e):
@@ -796,8 +854,12 @@ class DssConverterFrame(JFrame, ActionListener):
             elapsed = (datetime.datetime.now() - start_time).total_seconds()
             fraction = (float(bytes_converted) / self.bytes_to_convert)
             percent_complete = 100 * fraction
-            self.setDssFileVersionInTree(dss_file, 7)
-            self.file_versions[dss_file] = 7
+            if self.file_versions[dss_file] == 6 :
+                self.setDssFileVersionInTree(dss_file, 7)
+                self.file_versions[dss_file] = 7
+            elif self.file_versions[dss_file] == -1 :
+                self.setDssFileVersionInTree(dss_file, None)
+                self.file_versions[dss_file] = None
             self.pbFiles.setValue(files_converted)
             self.lblFilesCount.setText("{0} / {1}".format(files_converted, self.files_to_convert))
             self.pbBytes.setValue(int(percent_complete))
@@ -859,7 +921,7 @@ class BackgroundFileConverter(SwingWorker) :
             if self.converter.isCanceled() : 
                 super(BackgroundFileConverter, self).setProgress(100)
                 break
-            if self.file_versions[dss_file] == 6 :
+            if self.file_versions[dss_file] != 7 :
                 try :
                     relative_filename = dss_file[len(self.source_dir):]
                     if relative_filename[0] == os.sep :
@@ -878,13 +940,14 @@ class BackgroundFileConverter(SwingWorker) :
                         Paths.get(dss_file),
                         Paths.get(archive_file),
                         StandardCopyOption.REPLACE_EXISTING)
-                    self.util.setMessageFile(self.dss_message_file)
-                    self.util.setDSSFileName(archive_file)
-                    self.util.setMessageLevel(2)
-                    self.util.convertVersion(dss_file)
-                    self.util.close()
-                    self.files_converted += 1
-                    self.bytes_converted += self.file_sizes[dss_file]
+                    if self.file_versions[dss_file] == 6 :
+                        self.util.setMessageFile(self.dss_message_file)
+                        self.util.setDSSFileName(archive_file)
+                        self.util.setMessageLevel(2)
+                        self.util.convertVersion(dss_file)
+                        self.util.close()
+                        self.files_converted += 1
+                        self.bytes_converted += self.file_sizes[dss_file]
                     self.publish("\t".join(["END", str(time.time()), dss_file, archive_file, make_dir]))
                     self.setProgress(100 * self.bytes_converted // self.bytes_to_convert)
                 except :
@@ -900,19 +963,24 @@ class BackgroundFileConverter(SwingWorker) :
                 if status == "START" :
                     self.start_secs = float(time_val)
                     self.converter.setCurrentFile(dss_file)
-                    self.converter.setDssFileVersionInTree(dss_file, 6)
                     dss_file_only = os.path.split(dss_file)[1]
                     archive_dir = os.path.split(archive_file)[0]
-                    self.converter.log('Starting conversion of "{}"'.format(dss_file))
+                    if self.file_versions[dss_file] == 6 :
+                        self.converter.setDssFileVersionInTree(dss_file, 6)
+                        self.converter.log('Starting conversion of "{}"'.format(dss_file))
+                    else :
+                        self.converter.log('Archiving corrupt file "{}"'.format(dss_file))
                     if make_dir == "T" :
                         self.converter.log('    creating directory "{}"'.format(archive_dir))
                     self.converter.log('    moving "{}" to "{}"'.format(dss_file_only, archive_dir))
-                    self.converter.log('    converting into "{}"'.format(dss_file_only))
+                    if self.file_versions[dss_file] == 6 :
+                        self.converter.log('    converting into "{}"'.format(dss_file_only))
                 elif status == "END" :
                     self.converter.setCurrentFile(None)
-                    self.converter.log("    {0} converted in {1}".format(
-                        formatByteCount(self.file_sizes[dss_file]),
-                        secsToHms(float(time_val) - self.start_secs)))
+                    if self.file_versions[dss_file] == 6 :
+                        self.converter.log("    {0} converted in {1}".format(
+                            formatByteCount(self.file_sizes[dss_file]),
+                            secsToHms(float(time_val) - self.start_secs)))
                     self.converter.updateStatus(self.start_time, dss_file, self.files_converted, self.bytes_converted)
             except :
                 self.converter.log(traceback.format_exc())
@@ -989,6 +1057,8 @@ class CustomTreeCellRenderer(DefaultTreeCellRenderer):
         '''
         self.v6_files = set()
         self.v7_files = set()
+        self.corrupt_files = set()
+        self.moved_files = set()
         
     def setRowVersion(self, row, version) :
         '''
@@ -1000,6 +1070,11 @@ class CustomTreeCellRenderer(DefaultTreeCellRenderer):
         elif version == 7 :
             if row in self.v6_files : self.v6_files.remove(row)
             self.v7_files.add(row)
+        elif version == -1 :
+            self.corrupt_files.add(row)
+        elif version is None :
+            if row in self.corrupt_files :self.corrupt_files.remove(row)
+            self.moved_files.add(row)
 
     def getPreferredSize(self):
         '''
@@ -1014,11 +1089,23 @@ class CustomTreeCellRenderer(DefaultTreeCellRenderer):
         Render the text in the row based on whether it's a DSS file and the DSS file version
         '''
         c = super(CustomTreeCellRenderer, self).getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus)
+        font = c.getFont()
+        attrs = font.getAttributes()
+        attrs.remove(TextAttribute.STRIKETHROUGH)
+        c.setFont(Font(attrs))
 
         if row in self.v6_files :
             c.setForeground(Color.RED)
         elif row in self.v7_files :
             c.setForeground(Color.BLUE)
+        elif row in self.corrupt_files :
+            c.setForeground(Color.ORANGE.darker())
+            attrs.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON)
+            c.setFont(Font(attrs))
+        elif row in self.moved_files :
+            c.setForeground(Color.LIGHT_GRAY)
+            attrs.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON)
+            c.setFont(Font(attrs))
         else:
             c.setForeground(Color.BLACK)
         return c
@@ -1080,6 +1167,7 @@ def main() :
     # get the application frame #
     #---------------------------#
     application_frame = None
+    logs_menu = None
     for frame in Frame.getFrames() :
         if frame.__class__.__name__ in("ListSelection", "CwmsListSelection", "CaviFrame") and frame.isVisible() :
             application_frame = frame
@@ -1088,45 +1176,50 @@ def main() :
             center_on_x = loc.x + siz.width / 2
             center_on_y = loc.y + siz.height / 2
             break
-    #-------------------------------------#
-    # get the menu to attach log files to #
-    #-------------------------------------#
-    logs_menu = None
-    if frame.__class__.__name__ == "CaviFrame" :
-        #------#
-        # CAVI #
-        #------#
-        for component in frame.getComponents() :
-            if component.__class__.__name__ == "RmaJFrame$4" :
-                menu_bar = component.getMenuBar()
-                if menu_bar is not None :
+    else :
+        frame = None
+    if frame :
+        #-------------------------------------#
+        # get the menu to attach log files to #
+        #-------------------------------------#
+        if frame.__class__.__name__ == "CaviFrame" :
+            #------#
+            # CAVI #
+            #------#
+            for component in frame.getComponents() :
+                if component.__class__.__name__ == "RmaJFrame$4" :
+                    menu_bar = component.getMenuBar()
+                    if menu_bar is not None :
+                        for i in range(menu_bar.getComponentCount()) :
+                            menu = menu_bar.getComponentAtIndex(i)
+                            if menu.getText() == "Tools" :
+                                tool_menu = menu
+                                for component in tool_menu.getMenuComponents() :
+                                    if component.__class__.__name__ == "EnablableJMenu" and component.getText() == "Logs" :
+                                        logs_menu = component
+        elif frame.__class__.__name__ in ("ListSelection", "CwmsListSelection") :
+            #-------------------------#
+            # CWMS-Vue and HEC-DSSVue #
+            #-------------------------#
+            for component in frame.getComponents() :
+                if component.__class__.__name__ == "JRootPane" :
+                    menu_bar = component.getMenuBar()
                     for i in range(menu_bar.getComponentCount()) :
                         menu = menu_bar.getComponentAtIndex(i)
-                        if menu.getText() == "Tools" :
-                            tool_menu = menu
-                            for component in tool_menu.getMenuComponents() :
-                                if component.__class__.__name__ == "EnablableJMenu" and component.getText() == "Logs" :
+                        if menu.getText() == "Advanced" :
+                            advanced_menu = menu
+                            for component in advanced_menu.getMenuComponents() :
+                                if component.__class__.__name__ == "JMenu" and component.getText() == "Output" :
                                     logs_menu = component
-    elif frame.__class__.__name__ in ("ListSelection", "CwmsListSelection") :
-        #-------------------------#
-        # CWMS-Vue and HEC-DSSVue #
-        #-------------------------#
-        for component in frame.getComponents() :
-            if component.__class__.__name__ == "JRootPane" :
-                menu_bar = component.getMenuBar()
-                for i in range(menu_bar.getComponentCount()) :
-                    menu = menu_bar.getComponentAtIndex(i)
-                    if menu.getText() == "Advanced" :
-                        advanced_menu = menu
-                        for component in advanced_menu.getMenuComponents() :
-                            if component.__class__.__name__ == "JMenu" and component.getText() == "Output" :
-                                logs_menu = component
 
     window = DssConverterFrame()
-    window.setApplicationFrame(application_frame)
-    window.setLogsMenu(logs_menu)
+    if application_frame: 
+        window.setApplicationFrame(application_frame)
+    if logs_menu:
+        window.setLogsMenu(logs_menu)
     window.pack()
     window.setVisible(True)
+    window.btnTopLevelSrcDir.requestFocusInWindow()
 
 if __name__ == "__main__":
     threading.Thread(target=main).start()
