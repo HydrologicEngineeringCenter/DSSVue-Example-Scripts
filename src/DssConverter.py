@@ -1,7 +1,3 @@
-# name=DssConverter
-# displayinmenu=false
-# displaytouser=true
-# displayinselector=true
 '''
 A script to convert all HEC-DSS v6 files in a directory tree to HEC-DSS v7.
 
