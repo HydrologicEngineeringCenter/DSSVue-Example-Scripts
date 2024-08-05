@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 from hecdss import HecDss
+
 
 dss_file = "FlowData.dss"
 pathname = "/CUMBERLAND RIVER/BARBOURVILLE/FLOW//30Minute/OBS/"
@@ -13,9 +15,10 @@ for p in catalog:
 ts = dss.get(pathname)
 
 values = ts.values
-MISSING =-3.4028234663852886e+38
-tolerance = 100000
-values = [ None if abs(x - MISSING) < tolerance else x for x in values]
+missing_value = -340282346638528859811704183484516925440.000000
+indices = np.where(np.isclose(values, missing_value, rtol=0, atol=0, equal_nan=True))[0]
+values[indices] = None
+
 df1 = pd.DataFrame({
     'date':ts.times,
     'value':values
