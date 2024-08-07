@@ -12,7 +12,7 @@ from hec.script.Constants import TRUE, FALSE
 import sys
 #  Open the file and get the data
 try:  
-  dssFile = HecDss.open(sys.argv[1] + "\\sample.dss", "10MAR2006 2400, 09APR2006 2400")
+  dssFile = HecDss.open("C:\project\DSSVue-Example-Scripts\data\sample.dss", "10MAR2006 2400, 09APR2006 2400")
   precip = dssFile.get("/AMERICAN/FOLSOM/PRECIP-BASIN/01JAN2006/1DAY/OBS/")
   stor = dssFile.get("/AMERICAN/FOLSOM/ STOR-RES EOP/01JAN2006/1DAY/OBS/")
   topcon = dssFile.get("/AMERICAN/FOLSOM/TOP CON STOR/01JAN2006/1DAY/OBS/")
@@ -63,5 +63,21 @@ inflowCurve = plot.getCurve(inflow)
 inflowCurve.setLineColor("magenta")
 outflowCurve = plot.getCurve(outflow)
 outflowCurve.setLineColor("purple")
+print(type(precipCurve))
+prop = precipCurve.getProperties()
+print(type(prop))
+
+plot.setLegendItemVisible(precip,FALSE)
+g = plot.getGlyph(precip)
+print(type(g))
+#g.setLegendItemsVisible(FALSE)
+
+#   item.glyph.setLegendItemsVisible(_showInLegendCheck.isSelected());
+#public void setLegendItemVisible(DataContainer dataContainer, boolean isVisible) {
+#plot.setLegendItemVisible(precip,FALSE)
+
+
 
 plot.showPlot()
+plot.repaint()
+plot.stayOpen()
