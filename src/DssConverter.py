@@ -1000,7 +1000,6 @@ class BackgroundFileConverter(SwingWorker) :
 			if self.converter.isCanceled() : 
 				super(BackgroundFileConverter, self).setProgress(100)
 				break
-			print("DSS file = "+ dss_file)
 			if self.file_versions[dss_file] != 7 :
 				try :
 					relative_filename = dss_file[len(self.source_dir):]
