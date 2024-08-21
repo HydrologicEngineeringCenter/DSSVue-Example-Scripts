@@ -5,7 +5,7 @@ from hecdss.regular_timeseries import RegularTimeSeries
 
 def read_from_cwms(tsid, office_id, t1, t2):
     print(f'reading, {tsid}')
-    data = cwms.get_timeseries(tsId=tsid, office_id=office_id, begin=begin, end=end)
+    data = cwms.get_timeseries(ts_id=tsid, office_id=office_id, begin=begin, end=end)
     return data
 
 def write_to_dss(ts,path):
