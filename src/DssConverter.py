@@ -272,7 +272,7 @@ class DssConverterFrame(JFrame, ActionListener):
 		contentPane.add(self.lblEtaValue)
 		self.lblEtaValue.setText("")
 
-		self.ckbModifyExtractLists = JCheckBox("Modify Extract Lists", True)
+		self.ckbModifyExtractLists = JCheckBox("Modify Extract Lists", False)
 		self.ckbModifyExtractLists.setEnabled(False)
 		contentPane.add(self.ckbModifyExtractLists)
 		
