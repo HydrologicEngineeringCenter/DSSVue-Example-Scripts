@@ -107,7 +107,7 @@ class DssConverterFrame(JFrame, ActionListener):
 		'''
 		super(DssConverterFrame, self).__init__(title, gc)
 		self._title = "DSS v6 to v7 Converter"
-		self._version = "1.5"
+		self._version = "1.6"
 		self._width = 830
 		self._height = 830
 		self.logLock = threading.RLock()
