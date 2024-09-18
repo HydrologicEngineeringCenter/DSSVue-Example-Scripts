@@ -72,6 +72,10 @@ hms_pattern		= re.compile(r"\s*(\d+)\s*hr\s*(\d+)\s*min\s*(\d+)\s*sec\s*", re.I)
 var_pattern		= re.compile(r"(%(\w+)%|\$(\w+)|\$\((\w+)\))")
 center_on_x		= None
 center_on_y		= None
+topLevelDirectoryMessage = "<html><h3>Top Level Directories</h3>" \
+	+ "The <b>Top Level Source</b> and <b>Top Level Archive</b> directories must be unrelated.<br>" \
+	+ "Neither directory is allowed to be a sub-directory of the other.</html>"
+
 
 class DssConverterFrame(JFrame, ActionListener):
 	'''
@@ -197,6 +201,7 @@ class DssConverterFrame(JFrame, ActionListener):
 		
 		self.btnTopLevelSrcDir = JButton("Choose")
 		self.btnTopLevelSrcDir.addActionListener(self.chooseTopLevelDirs)
+		self.btnTopLevelSrcDir.setToolTipText(topLevelDirectoryMessage)
 		contentPane.add(self.btnTopLevelSrcDir)
 		
 		self.lblTopLevelArchDir = JLabel("Top Level Archive Directory")
@@ -209,6 +214,7 @@ class DssConverterFrame(JFrame, ActionListener):
 		
 		self.btnTopLevelArchDir = JButton("Choose")
 		self.btnTopLevelArchDir.addActionListener(self.chooseTopLevelDirs)
+		self.btnTopLevelArchDir.setToolTipText(topLevelDirectoryMessage)
 		contentPane.add(self.btnTopLevelArchDir)
 
 		self.lblV6DssFile = JLabel("Version 6 DSS file")
@@ -1331,6 +1337,12 @@ def main() :
 	window.pack()
 	window.setVisible(True)
 	window.btnTopLevelSrcDir.requestFocusInWindow()
+	JOptionPane.showConfirmDialog(
+		window,
+		topLevelDirectoryMessage,
+		"Usage Note",
+		JOptionPane.OK_CANCEL_OPTION,
+		JOptionPane.INFORMATION_MESSAGE) 
 
 if __name__ == "__main__":
 	threading.Thread(target=main).start()
