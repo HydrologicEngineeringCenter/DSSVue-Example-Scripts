@@ -1,20 +1,31 @@
-from hec.heclib.dss import HecDss, HecTimeSeries
-from hec.io import TimeSeriesContainer
-import sys
+from hec.heclib.dss import HecDss, DSSPathname
+
+def rewriteTscAsDouble(dss,pathname):
+	""" converts time series record to double-precision 
+	     convert by:
+	       - reading the record into memory
+	       - delete from disk
+	       - save to disk with storedAsdoubles = True     
+	"""
+
+	if dss.recordExists(pathname):
+		tsc = dss.get(pathname)
+		print("tsc.dataType =",tsc.dataType)
+		if tsc.storedAsdoubles:
+			print("already doubles")
+			return
+		d = [pathname]
+		dss.delete(d)
+		tsc.storedAsdoubles = True
+		dss.put(tsc)
+		print("converted/saved to double")
+	else:
+		print(path,"does not exist")
 
 
-file = R"C:\project\DSSVue-Example-Scripts\data\kinzua.dss"
-path="//AG RESORT/FLOW/01Feb2014/15Minute/FOR:ALTERNATIVE 1:B0C0/"
+fileName = r"C:\tmp\forecast7.dss"
+path = "//FTPK/FLOW-LOCAL/01Jan2024/1DAY/FCST RUNOFF: ----40/"
+#path = "//FTPK/ELEV-ESTIMATED/01Jan2024/IR-Month/BEST-MRBWM/"
 
-dss2 = HecDss.open(file)
-flow = dss2.get(path)
-print (flow.numberValues )
-print("flow.dataType =",flow.dataType)
-
-# -- Output ---
-# 529
-# ('flow.dataType =', 105)
-
-
-
-sys.stdin.readline()
+dss = HecDss.open(fileName)
+rewriteTscAsDouble(dss,path)
