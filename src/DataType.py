@@ -14,6 +14,7 @@ def deleteRecords(dss,pathname):
 		
 
 def getPathWithNewDPart(pathname,newDpart):
+	"""  rebuild pathaname with specificed D part """
 	dp = DSSPathname(pathname)
 	return DSSPathname.buildPathnameFromParts(dp.aPart(),dp.bPart(),dp.cPart(),newDpart,dp.ePart(),dp.fPart())
 	
