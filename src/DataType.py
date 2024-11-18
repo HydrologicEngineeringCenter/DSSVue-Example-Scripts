@@ -28,4 +28,4 @@ path = "//FTPK/FLOW-LOCAL/01Jan2024/1DAY/FCST RUNOFF: ----40/"
 #path = "//FTPK/ELEV-ESTIMATED/01Jan2024/IR-Month/BEST-MRBWM/"
 
 dss = HecDss.open(fileName)
-rewriteTscAsDouble(dss,path)
+rewriteTscAsDouble(dss,pathname)
