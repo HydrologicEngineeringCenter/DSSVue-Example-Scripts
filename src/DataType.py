@@ -20,7 +20,7 @@ def rewriteTscAsDouble(dss,pathname):
 		dss.put(tsc)
 		print("converted/saved to double")
 	else:
-		print(path,"does not exist")
+		print(pathname,"does not exist")
 
 
 fileName = r"C:\tmp\forecast7.dss"
