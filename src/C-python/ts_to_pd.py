@@ -32,7 +32,7 @@ def convert_ts_to_pd(dss_filename: str, pathname: str):
         print(f" record_count = {dss.record_count()}")
         ts = dss.get(pathname)
 
-        for month in range(1, 12):
+        for month in range(1, 13):
             print(month)
             pd = create_pd(ts,month)
             p = DssPath(ts.id)
