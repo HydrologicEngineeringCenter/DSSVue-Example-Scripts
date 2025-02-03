@@ -4,17 +4,21 @@ import numpy as np
 from hecdss import HecDss
 
 
+# pip install -i https://test.pypi.org/simple/ hecdss
+# pip install matplotlib
+
+
 dss_file = "FlowData.dss"
 pathname = "/CUMBERLAND RIVER/BARBOURVILLE/FLOW//30Minute/OBS/"
-dss = HecDss(dss_file)
+with HecDss(dss_file) as dss:
 
-catalog = dss.get_catalog()
-for p in catalog:
-    print(p)
+    catalog = dss.get_catalog()
+    for p in catalog:
+        print(p)
 
-ts = dss.get(pathname)
+    ts = dss.get(pathname)
 
-values = ts.values
+    values = ts.values
 missing_value = -340282346638528859811704183484516925440.000000
 indices = np.where(np.isclose(values, missing_value, rtol=0, atol=0, equal_nan=True))[0]
 values[indices] = None
