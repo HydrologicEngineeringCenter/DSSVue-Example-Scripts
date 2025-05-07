@@ -1,5 +1,5 @@
 from hec.heclib.util import HecTime
-from java.util import SimpleTimeZone
+from java.util import TimeZone
 
 t = HecTime("17Jul2024 15:00")
 eastern = TimeZone.getTimeZone("America/New_York");
