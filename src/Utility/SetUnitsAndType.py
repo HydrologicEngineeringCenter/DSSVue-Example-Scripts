@@ -6,6 +6,7 @@ from hec.heclib.dss import HecDssCatalog, DSSPathname
 
 filename = r"C:\tmp\USGSJustRes.dss"
 catalog = HecDssCatalog(filename)
+dss = HecDss.open(filename)
 paths = catalog.getCondensedCatalog("")
 
 
