@@ -1,4 +1,4 @@
-converfrom hec.heclib.dss import HecDss
+from hec.heclib.dss import HecDss
 from hec.heclib.dss import HecDSSUtilities
 from hec.heclib.util import Heclib
 import os
