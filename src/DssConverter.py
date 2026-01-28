@@ -1,6 +1,9 @@
 '''
 A script to convert all HEC-DSS v6 files in a directory tree to HEC-DSS v7.
 
+WARNING: To update to DSS Version 7 files, you must use HEC-RTS version 3.5 or older, or HEC-DSSVue 3.4 or older. Newer versions of this software do not support this conversion.
+
+
 * Uses UI to select top-level source and archive directories and to monitor operation
 * For each HEC-DSS v6 file in the source directory tree:
   * File is moved to same relative location in archive directory tree with the same filename
@@ -1346,3 +1349,4 @@ def main() :
 
 if __name__ == "__main__":
 	threading.Thread(target=main).start()
+
