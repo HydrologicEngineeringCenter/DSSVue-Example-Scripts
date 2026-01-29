@@ -1,7 +1,7 @@
 '''
 A script to convert all HEC-DSS v6 files in a directory tree to HEC-DSS v7.
 
-WARNING: To update to DSS Version 7 files, you must use HEC-RTS version 3.5 or older, or HEC-DSSVue 3.4 or older. Newer versions of this software do not support this conversion.
+WARNING: To update to DSS Version 7 files, you must use CWMS version 3.5 or older, or HEC-DSSVue 3.4 or older. Newer versions of this software do not support this conversion.
 
 
 * Uses UI to select top-level source and archive directories and to monitor operation
@@ -1283,11 +1283,24 @@ def main() :
 	'''
 	global center_on_x, center_on_y
 	UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel")
+    	# verify DSS version 
+    	ver = Heclib.getLibraryVersion()
+    	max_allowed_dss_version = 70924 # 7-IX
+    	if ver > max_allowed_dss_version:
+    		JOptionPane.showConfirmDialog(
+    			None,
+    			"To update to DSS Version 7 files, you must use CWMS version 3.5 or older, or HEC-DSSVue 3.4 or older.",	
+    			"Unsupported Version of Heclib",
+    			JOptionPane.OK_CANCEL_OPTION)
+       		return
+                                
+        
 	#---------------------------#
 	# get the application frame #
 	#---------------------------#
 	application_frame = None
 	logs_menu = None
+    
 	for frame in Frame.getFrames() :
 		if frame.__class__.__name__ in("ListSelection", "CwmsListSelection", "CaviFrame") and frame.isVisible() :
 			application_frame = frame
@@ -1349,4 +1362,3 @@ def main() :
 
 if __name__ == "__main__":
 	threading.Thread(target=main).start()
-
