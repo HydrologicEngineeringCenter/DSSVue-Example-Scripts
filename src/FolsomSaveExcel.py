@@ -1,6 +1,7 @@
 from hec.script import MessageBox
 from hec.heclib.dss import HecDss
-from hec.dataTable import HecDataTableToExcel
+# old: from hec.dataTable import HecDataTableToExcel
+from hec.dssgui.excel import HecDataTableToExcel
 import java
 import sys
 import os
