@@ -16,6 +16,6 @@ for pathname in pathnames:
     destination.put(container) 
     print("Copied %s", pathname)
 
-source.done()
-destination.done()
+source.close()
+destination.close()
 print("Done.  Wrote to " + destinationFile)
